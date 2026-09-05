@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-get-top-wallpapers"
+description = "Enables the get_top_wallpapers command without any pre-configured scope."
+commands.allow = ["get_top_wallpapers"]
+
+[[permission]]
+identifier = "deny-get-top-wallpapers"
+description = "Denies the get_top_wallpapers command without any pre-configured scope."
+commands.deny = ["get_top_wallpapers"]

@@ -1,7 +1,7 @@
-use tauri::api::path::{config_dir, picture_dir};
 use crate::config::interface::Config;
 use crate::utils::error::{WallResult, Error};
 use toml::Table;
+use tauri::{AppHandle, Manager};
 
 
 impl Config {
@@ -11,9 +11,10 @@ impl Config {
         }
     }
 
-    pub fn save(&self) -> WallResult<()> {
-        let config_path = config_dir().ok_or(Error::new("config path error"))?;
-        let config_path = config_path.join("config.toml");
+    pub fn save(&self, app: &AppHandle) -> WallResult<()> {
+        let config_dir = app.path().config_dir().map_err(|e| Error::new(&format!("配置路径错误: {e}")))?;
+        std::fs::create_dir_all(&config_dir)?;
+        let config_path = config_dir.join("config.toml");
         std::fs::create_dir_all(&self.download_path)?;
         let config = Self::new(self.download_path.clone());
         let toml_config = toml::to_string(&config)?;
@@ -22,19 +23,15 @@ impl Config {
     }
 
     // 从本机配置文件读取配置
-    pub fn load() -> WallResult<Self> {
-        let config_path_dir = config_dir().ok_or(Error::new("获取配置目录失败"))?;
-        let config_path = config_path_dir.join("config.toml");
+    pub fn load(app: &AppHandle) -> WallResult<Self> {
+        let config_dir = app.path().config_dir().map_err(|e| Error::new(&format!("获取配置目录失败: {e}")))?;
+        let config_path = config_dir.join("config.toml");
         
         // 判断config_path是否存在
         if !config_path.exists() {
             // 创建默认配置
-            let default_config = Self::default();
-            if let Err(e) = std::fs::create_dir_all(&default_config.download_path) {
-                eprintln!("创建下载目录失败: {}", e);
-            }
-            let toml_config = toml::to_string(&default_config)?;
-            std::fs::write(&config_path, toml_config)?;
+            let default_config = Self::default_for(app);
+            default_config.save(app)?;
             return Ok(default_config);
         }
         
@@ -55,9 +52,10 @@ impl Config {
     }
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        let download_path = picture_dir()
+impl Config {
+    pub fn default_for(app: &AppHandle) -> Self {
+        let download_path = app.path().picture_dir()
+            .ok()
             .and_then(|p| p.to_str().map(|s| s.to_string()))
             .unwrap_or_else(|| {
                 // 如果获取图片目录失败，使用用户主目录下的 Pictures

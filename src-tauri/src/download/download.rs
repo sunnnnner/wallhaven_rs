@@ -1,6 +1,6 @@
 use std::io::Write;
 use http_cache_reqwest::CacheMode;
-use tauri::State;
+use tauri::{AppHandle, State};
 use crate::api::http::Context;
 use crate::config::interface::Config;
 use crate::utils::error::WallResult;
@@ -20,9 +20,9 @@ impl Download {
         }
     }
 
-    pub async fn save(&self, context: State<'_, Context>) -> WallResult<()> {
+    pub async fn save(&self, app: &AppHandle, context: State<'_, Context>) -> WallResult<()> {
         // 加载配置并确保路径存在
-        let config = Config::load()?;
+        let config = Config::load(app)?;
         let download_path = std::path::Path::new(&config.download_path);
         
         // 确保下载目录存在

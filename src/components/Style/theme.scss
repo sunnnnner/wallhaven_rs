@@ -6,13 +6,14 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
 
   .left {
+    flex-shrink: 0;
+    max-width: 55%;
     height: 100%;
     display: flex;
     flex-direction: column;
     background: #ffffff;
     box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
     position: relative;
-    transition: width 0.3s ease;
 
     .sidebar-header {
       padding: 16px;
@@ -83,14 +84,14 @@
     
     &.selected {
       .thumbnail-wrapper {
-        border: 3px solid #67c23a;
+        border-color: #67c23a;
         box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
       }
     }
 
     &.active {
       .thumbnail-wrapper {
-        border: 3px solid #409EFF;
+        border-color: #409EFF;
         box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
       }
     }
@@ -98,14 +99,14 @@
     .thumbnail-wrapper {
       position: relative;
       width: 100%;
-      border: 2px solid transparent;
+      border: 3px solid transparent;
       border-radius: 8px;
       overflow: hidden;
       cursor: pointer;
       transition: all 0.3s ease;
       background: #f5f7fa;
 
-      &:hover {
+      &:hover, &:focus-within {
         transform: translateY(-2px);
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 
@@ -130,6 +131,7 @@
       }
 
       .thumbnail-overlay {
+        pointer-events: none;
         position: absolute;
         top: 0;
         left: 0;
@@ -148,7 +150,8 @@
         justify-content: space-between;
         padding: 8px;
 
-        .select-checkbox {
+        .ant-checkbox-wrapper {
+          pointer-events: auto;
           align-self: flex-start;
         }
 
@@ -170,6 +173,7 @@
 
   .right-content {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -192,6 +196,8 @@
       background: #ffffff;
       border-bottom: 1px solid #e4e7ed;
       display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -203,7 +209,7 @@
         flex: 1;
         overflow: hidden;
 
-        .el-tag {
+        .ant-tag {
           max-width: 300px;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -219,6 +225,7 @@
 
     .full-image-container {
       flex: 1;
+      min-height: 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -239,6 +246,8 @@
       background: #ffffff;
       border-top: 1px solid #e4e7ed;
       display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);

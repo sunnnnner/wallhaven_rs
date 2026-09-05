@@ -1,0 +1,21 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permissions required by the main and settings windows",
+  "windows": ["main", "theUniqueLabel"],
+  "permissions": [
+    "allow-get-top-wallpapers",
+    "allow-save-config",
+    "allow-load-config",
+    "allow-download-wallpaper",
+    "core:event:default",
+    "core:app:allow-version",
+    "core:window:allow-get-all-windows",
+    "core:webview:allow-create-webview-window",
+    "core:window:allow-show",
+    "core:window:allow-set-focus",
+    "core:window:allow-close",
+    "dialog:allow-open",
+    "shell:allow-open"
+  ]
+}

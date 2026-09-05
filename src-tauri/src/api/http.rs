@@ -5,16 +5,15 @@ use reqwest::{
 
 use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
 use http_cache_reqwest::{Cache, CacheMode, CACacheManager, HttpCache, HttpCacheOptions};
-use tauri::api::path::cache_dir;
+use std::path::PathBuf;
 
 
 #[derive(Debug)]
 pub struct Context {
     pub client: ClientWithMiddleware,
 }
-
 impl Context {
-    pub fn new() -> Self {
+    pub fn new(cache_path: PathBuf) -> Self {
         let mut headers = HeaderMap::new();
         headers.insert(
             USER_AGENT,
@@ -51,12 +50,7 @@ impl Context {
             .expect("Failed to create sec-fetch-site header"));
         
         // 获取系统缓存目录
-        let cache_path = cache_dir()
-            .map(|p| p.join("wallhaven_rs").join("http-cache"))
-            .unwrap_or_else(|| {
-                // 如果获取失败，使用临时目录
-                std::env::temp_dir().join("wallhaven_rs").join("http-cache")
-            });
+        let cache_path = cache_path.join("wallhaven_rs").join("http-cache");
         
         // 确保缓存目录存在
         if let Err(e) = std::fs::create_dir_all(&cache_path) {
@@ -80,12 +74,5 @@ impl Context {
     
     pub fn http_client(&self) -> &ClientWithMiddleware {
         &self.client
-    }
-}
-
-
-impl Default for Context {
-    fn default() -> Self {
-        Self::new()
     }
 }
