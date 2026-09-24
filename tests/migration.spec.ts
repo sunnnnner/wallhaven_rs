@@ -30,12 +30,12 @@ async function mockDesktop(page: Page) {
           if (command === 'plugin:app|version') return '2.0.0'
           if (command === 'plugin:window|get_all_windows') return state.windows
           if (command === 'plugin:webview|create_webview_window') { state.windows.push(args.options.label); return }
-          if (command === 'download_wallpaper') {
+          if (command === 'download_wallpaper' || command === 'set_as_wallpaper') {
             await new Promise((resolve) => setTimeout(resolve, 150))
             if (location.search.includes('failDownload') && args.file_name.endsWith('-2.png')) throw new Error('download failed')
             return
           }
-          if (['plugin:window|show', 'plugin:window|set_focus', 'plugin:window|close', 'plugin:shell|open'].includes(command)) return
+          if (['plugin:window|show', 'plugin:window|set_focus', 'plugin:window|close', 'plugin:shell|open', 'plugin:window|minimize', 'plugin:window|toggle_maximize', 'plugin:window|internal_toggle_maximize', 'plugin:window|start_dragging'].includes(command)) return
           throw new Error(`Unexpected IPC command: ${command}`)
         },
       },

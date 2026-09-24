@@ -5,7 +5,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:1425',
     viewport: { width: 1280, height: 800 },
-    launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH },
+    launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || '/usr/bin/google-chrome' },
     screenshot: 'only-on-failure',
   },
   webServer: {

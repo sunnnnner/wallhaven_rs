@@ -18,4 +18,6 @@ export interface Wallpaper {
 
 export interface Config {
   download_path: string
+  proxy?: string
 }
+

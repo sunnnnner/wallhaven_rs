@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { invoke } from '@tauri-apps/api/core'
-import { downloadWallpaper, loadConfig, queryWallpapers, saveDownloadPath } from './api'
+import { downloadWallpaper, loadConfig, queryWallpapers, saveDownloadPath, setAsWallpaper, testProxyConnection } from './api'
 import { appendWallpapers } from './wallpapers'
 import type { Wallpaper } from './types'
 
@@ -33,9 +33,21 @@ describe('wallpaper IPC contract', () => {
     await saveDownloadPath('/tmp/Wallpapers')
     await loadConfig()
     await downloadWallpaper('https://w.wallhaven.cc/full/ab/one.jpg', 'one.jpg')
+    await setAsWallpaper('https://w.wallhaven.cc/full/ab/one.jpg', 'one.jpg')
     expect(invoke).toHaveBeenNthCalledWith(1, 'save_config', { path: '/tmp/Wallpapers' })
     expect(invoke).toHaveBeenNthCalledWith(2, 'load_config')
     expect(invoke).toHaveBeenNthCalledWith(3, 'download_wallpaper', { url: 'https://w.wallhaven.cc/full/ab/one.jpg', file_name: 'one.jpg' })
+    expect(invoke).toHaveBeenNthCalledWith(4, 'set_as_wallpaper', { url: 'https://w.wallhaven.cc/full/ab/one.jpg', file_name: 'one.jpg' })
+  })
+
+  it('supports saving proxy and testing proxy connection', async () => {
+    await saveDownloadPath('/tmp/Wallpapers', 'http://127.0.0.1:7890')
+    expect(invoke).toHaveBeenLastCalledWith('save_config', { path: '/tmp/Wallpapers', proxy: 'http://127.0.0.1:7890' })
+
+    vi.mocked(invoke).mockResolvedValueOnce(120)
+    const latency = await testProxyConnection('http://127.0.0.1:7890')
+    expect(latency).toBe(120)
+    expect(invoke).toHaveBeenLastCalledWith('test_proxy_connection', { proxy: 'http://127.0.0.1:7890' })
   })
 
   it('does not append duplicate wallpapers across pages', () => {

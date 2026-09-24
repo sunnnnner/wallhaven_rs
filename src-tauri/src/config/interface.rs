@@ -3,6 +3,8 @@
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Config {
     pub download_path: String,
+    #[serde(default)]
+    pub proxy: Option<String>,
 }
 
 

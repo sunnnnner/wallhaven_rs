@@ -15,9 +15,10 @@
     "windows": [
       {
         "label": "main",
-        "title": "Wallpapers图片浏览器",
-        "width": 800,
-        "height": 750
+        "title": "Wallhaven",
+        "width": 1920,
+        "height": 1080,
+        "decorations": false
       }
     ],
     "security": {

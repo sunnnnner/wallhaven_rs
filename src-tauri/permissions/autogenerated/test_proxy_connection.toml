@@ -1,0 +1,9 @@
+[[permission]]
+identifier = "allow-test-proxy-connection"
+description = "Enables the test_proxy_connection command without any pre-configured scope."
+commands.allow = ["test_proxy_connection"]
+
+[[permission]]
+identifier = "deny-test-proxy-connection"
+description = "Denies the test_proxy_connection command without any pre-configured scope."
+commands.deny = ["test_proxy_connection"]

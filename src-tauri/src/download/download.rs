@@ -20,7 +20,7 @@ impl Download {
         }
     }
 
-    pub async fn save(&self, app: &AppHandle, context: State<'_, Context>) -> WallResult<()> {
+    pub async fn save(&self, app: &AppHandle, context: State<'_, Context>) -> WallResult<std::path::PathBuf> {
         // 加载配置并确保路径存在
         let config = Config::load(app)?;
         let download_path = std::path::Path::new(&config.download_path);
@@ -65,6 +65,6 @@ impl Download {
             ))?;
         
         println!("下载成功: {:?}", file_path);
-        Ok(())
+        Ok(file_path)
     }
 }

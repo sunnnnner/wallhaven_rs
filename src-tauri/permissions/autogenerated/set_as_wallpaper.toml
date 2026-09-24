@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-set-as-wallpaper"
+description = "Enables the set_as_wallpaper command without any pre-configured scope."
+commands.allow = ["set_as_wallpaper"]
+
+[[permission]]
+identifier = "deny-set-as-wallpaper"
+description = "Denies the set_as_wallpaper command without any pre-configured scope."
+commands.deny = ["set_as_wallpaper"]

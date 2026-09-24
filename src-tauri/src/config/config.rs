@@ -5,9 +5,17 @@ use tauri::{AppHandle, Manager};
 
 
 impl Config {
-    pub fn new(download_path: String) -> Self {
+    pub fn new(download_path: String, proxy: Option<String>) -> Self {
         Self {
             download_path,
+            proxy: proxy.and_then(|p| {
+                let trimmed = p.trim();
+                if trimmed.is_empty() {
+                    None
+                } else {
+                    Some(trimmed.to_string())
+                }
+            }),
         }
     }
 
@@ -16,8 +24,7 @@ impl Config {
         std::fs::create_dir_all(&config_dir)?;
         let config_path = config_dir.join("config.toml");
         std::fs::create_dir_all(&self.download_path)?;
-        let config = Self::new(self.download_path.clone());
-        let toml_config = toml::to_string(&config)?;
+        let toml_config = toml::to_string(self)?;
         std::fs::write(config_path, toml_config)?;
         Ok(())
     }
@@ -47,8 +54,13 @@ impl Config {
             .and_then(|v| v.as_str())
             .ok_or(Error::new("配置文件中缺少 download_path 字段"))?
             .to_string();
-        
-        Ok(Self::new(download_path))
+
+        let proxy = config
+            .get("proxy")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+
+        Ok(Self::new(download_path, proxy))
     }
 }
 
@@ -62,9 +74,7 @@ impl Config {
                 let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
                 format!("{}/Pictures", home)
             });
-        
-        Self {
-            download_path,
-        }
+
+        Self::new(download_path, None)
     }
 }

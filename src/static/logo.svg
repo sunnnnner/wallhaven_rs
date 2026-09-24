@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <!-- 香槟金主光渐变 -->
+    <linearGradient id="goldGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D4A853" />
+      <stop offset="50%" stop-color="#F3D089" />
+      <stop offset="100%" stop-color="#E4B863" />
+    </linearGradient>
+
+    <!-- 磨砂晶体渐变 -->
+    <linearGradient id="glassGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255, 255, 255, 0.95)" />
+      <stop offset="50%" stop-color="rgba(255, 255, 255, 0.45)" />
+      <stop offset="100%" stop-color="rgba(180, 215, 255, 0.25)" />
+    </linearGradient>
+
+    <!-- 深海流体次层渐变 -->
+    <linearGradient id="deepGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(30, 58, 95, 0.85)" />
+      <stop offset="100%" stop-color="rgba(15, 30, 54, 0.95)" />
+    </linearGradient>
+
+    <!-- 金色漫射光滤镜 -->
+    <filter id="goldGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- 底层金色光晕层 (W 形状波谷聚光) -->
+  <path d="M26 42 C29 68 38 98 48 98 C56 98 60 76 64 64 C68 76 72 98 80 98 C90 98 99 68 102 42" 
+        stroke="url(#goldGrad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" 
+        opacity="0.35" filter="url(#goldGlow)" />
+
+  <!-- 第二层：深海艺术山峦流体 (暗层对比) -->
+  <path d="M24 40 C28 66 38 94 48 94 C57 94 61 74 64 60 C67 74 71 94 80 94 C90 94 100 66 104 40 C96 56 86 78 80 78 C73 78 68 56 64 42 C60 56 55 78 48 78 C42 78 32 56 24 40 Z" 
+        fill="url(#deepGrad)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />
+
+  <!-- 第三层：流体香槟金光带 (主视觉线，勾勒出优雅的 W 曲线) -->
+  <path d="M24 40 C28 66 38 94 48 94 C57 94 61 74 64 60 C67 74 71 94 80 94 C90 94 100 66 104 40" 
+        stroke="url(#goldGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- 第四层：前层透光晶体缎带 (毛玻璃拟态立体反光层) -->
+  <path d="M20 44 C26 70 37 90 48 90 C58 90 62 70 64 54 C66 70 70 90 80 90 C91 90 102 70 108 44 C104 54 94 72 80 72 C71 72 67 48 64 34 C61 48 57 72 48 72 C34 72 24 54 20 44 Z" 
+        fill="url(#glassGrad)" />
+
+  <!-- 顶部微光高光线 -->
+  <path d="M22 42 C30 64 39 84 48 84 C56 84 61 64 64 48 C67 64 72 84 80 84 C89 84 98 64 106 42" 
+        stroke="rgba(255, 255, 255, 0.8)" stroke-width="2" stroke-linecap="round" />
+
+  <!-- 视觉焦点微晶星芒 -->
+  <circle cx="64" cy="34" r="2.5" fill="#FFF" opacity="0.9" />
+</svg>

@@ -45,7 +45,13 @@ impl TopTag {
         let url = self.get_url();
         let client = context.http_client();
         let response = client.get(url).send().await?;
+        if !response.status().is_success() {
+            return Err(Error::new(&format!("Wallhaven 响应异常: HTTP {}", response.status())));
+        }
         let body = response.text().await?;
+        if body.contains("wallhaven.cc's taking a little nap") || body.contains("wallhaven.cc Status") {
+            return Err(Error::new("Wallhaven 官方服务器维护中，请稍后再试"));
+        }
         let document = scraper::Html::parse_document(&body);
         let main_selector = Selector::parse("main")?;
         let section_selector = Selector::parse("section")?;
@@ -129,3 +135,45 @@ impl TopTag {
         Ok(response)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[ignore]
+    fn test_fetch_real() {
+        tauri::async_runtime::block_on(async {
+        let tag = TopTag {
+            categories: 111,
+            purity: 110,
+            topRange: "".to_string(),
+            sorting: "date_added".to_string(),
+            order: "desc".to_string(),
+            ai_art_filter: 1,
+            page: 1,
+        };
+        let context = Context::new(std::env::temp_dir(), Some("http://192.168.18.15:7890"));
+        let client = context.http_client();
+        let url = tag.get_url();
+        println!("Fetching URL: {}", url);
+        let resp = client.get(&url).send().await.expect("send failed");
+        println!("Status: {:?}", resp.status());
+        println!("Headers: {:?}", resp.headers());
+        let body = resp.text().await.expect("text failed");
+        println!("Body length: {}", body.len());
+        let doc = scraper::Html::parse_document(&body);
+        let main_sel = Selector::parse("main").unwrap();
+        let main = doc.select(&main_sel).next().expect("Main not found");
+        let section_sel = Selector::parse("section").unwrap();
+        let section = main.select(&section_sel).next().expect("Section not found");
+        let ul_sel = Selector::parse("ul").unwrap();
+        let ul = section.select(&ul_sel).next().expect("Ul not found");
+        let li_sel = Selector::parse("li").unwrap();
+        let count = ul.select(&li_sel).count();
+        println!("Parsed wallpaper count: {}", count);
+        assert!(count > 0, "No wallpapers found in list!");
+        });
+    }
+}
+

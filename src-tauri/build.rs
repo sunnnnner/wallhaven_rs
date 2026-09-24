@@ -4,6 +4,7 @@ fn main() {
         "save_config",
         "load_config",
         "download_wallpaper",
+        "set_as_wallpaper",
     ]);
     tauri_build::try_build(tauri_build::Attributes::new().app_manifest(manifest))
         .expect("failed to build Tauri application");
