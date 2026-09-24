@@ -1,7 +1,12 @@
 import { test } from '@playwright/test'
+import fs from 'fs'
 import path from 'path'
 
-const artifactDir = '/home/knd/.gemini/antigravity/brain/cdd5fa78-61fe-4456-ab7b-832ffd0e2c1d'
+const artifactDir = process.env.ARTIFACT_DIR || path.join(process.cwd(), 'test-artifacts')
+
+if (!fs.existsSync(artifactDir)) {
+  fs.mkdirSync(artifactDir, { recursive: true })
+}
 
 async function mockDesktop(page: any) {
   await page.addInitScript(() => {
