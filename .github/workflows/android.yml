@@ -11,6 +11,14 @@ on:
         options:
           - release
           - debug
+      target_arch:
+        description: '目标架构 (主流真机选 aarch64 构建最快，多架构选 aarch64,armv7,x86_64)'
+        required: true
+        default: 'aarch64'
+        type: choice
+        options:
+          - 'aarch64'
+          - 'aarch64,armv7,x86_64'
   push:
     tags:
       - 'v*'
@@ -68,20 +76,20 @@ jobs:
       - name: Pnpm install
         run: pnpm install --frozen-lockfile
 
-      - name: Verify frontend and Rust
-        run: |
-          pnpm test
-          cargo check --manifest-path src-tauri/Cargo.toml
+      - name: Run frontend tests
+        run: pnpm test
 
       - name: Build Android APK
         env:
           RUST_BACKTRACE: 1
         run: |
-          if [ "${{ github.event.inputs.build_type }}" = "debug" ]; then
-            pnpm tauri android build --debug --apk --target aarch64,armv7,x86_64
-          else
-            pnpm tauri android build --apk --target aarch64,armv7,x86_64
+          BUILD_TYPE="${{ github.event.inputs.build_type || 'release' }}"
+          TARGETS="${{ github.event.inputs.target_arch || 'aarch64' }}"
+          EXTRA_FLAG=""
+          if [ "$BUILD_TYPE" = "debug" ]; then
+            EXTRA_FLAG="--debug"
           fi
+          pnpm tauri android build $EXTRA_FLAG --apk --target $TARGETS
 
       - name: Organize APK outputs
         run: |
