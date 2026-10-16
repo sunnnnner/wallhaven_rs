@@ -15,5 +15,5 @@ fn main() {
         }
     }
 
-    wallhaven_rs::run();
+    wallhaven_rs_lib::run();
 }

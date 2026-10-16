@@ -1,10 +1,11 @@
-import { FolderOpenOutlined, GithubOutlined, GlobalOutlined, InfoCircleOutlined, LinkOutlined, SettingOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, FolderOpenOutlined, GithubOutlined, GlobalOutlined, InfoCircleOutlined, LinkOutlined, SettingOutlined } from '@ant-design/icons'
 import { Button, Checkbox, Descriptions, Form, Input, InputNumber, Layout, Modal, Radio, Slider, Space, Switch, Tabs, Tag, message } from 'antd'
 import { getVersion } from '@tauri-apps/api/app'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open as chooseDirectory } from '@tauri-apps/plugin-dialog'
 import { open } from '@tauri-apps/plugin-shell'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { loadConfig, saveDownloadPath, testProxyConnection } from '../api'
 import appLogo from '../static/logo.png'
 
@@ -41,11 +42,20 @@ const defaults: FormValues = {
 }
 
 export function ConfigPage() {
+  const navigate = useNavigate()
   const [form] = Form.useForm<FormValues>()
   const [modal, contextHolder] = Modal.useModal()
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('basic')
   const [version, setVersion] = useState('')
+
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      navigate(-1)
+    } else {
+      getCurrentWindow().close().catch(() => {})
+    }
+  }
   const [testingProxy, setTestingProxy] = useState(false)
   const [proxyLatency, setProxyLatency] = useState<number | null>(null)
   const [gpuInfo, setGpuInfo] = useState<{ renderer: string; isHardware: boolean }>({
@@ -170,8 +180,15 @@ export function ConfigPage() {
   return (
     <Layout className="config-page min-h-screen bg-[#0B1322]">
       {contextHolder}
-      <div className="config-header sticky top-0 z-20 flex items-center justify-between px-6 py-3.5 bg-white/5 backdrop-blur-[40px] backdrop-saturate-[180%] border-b border-white/8 shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_4px_12px_-2px_rgba(0,0,0,0.3)]">
+      <div className="config-header sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-3.5 bg-white/5 backdrop-blur-[40px] backdrop-saturate-[180%] border-b border-white/8 shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_4px_12px_-2px_rgba(0,0,0,0.3)]">
         <div className="flex items-center gap-2.5">
+          <Button
+            type="text"
+            icon={<ArrowLeftOutlined className="text-white/70" />}
+            onClick={handleClose}
+            aria-label="返回"
+            className="!h-7 !w-7 !min-w-7 !p-0 !rounded-lg !border-transparent !bg-white/4 hover:!bg-white/10 !text-white/70 active:!scale-95"
+          />
           <div className="w-7 h-7 rounded-lg bg-[#E4B863] text-[#0B1322] flex items-center justify-center shadow-xs">
             <SettingOutlined className="text-xs" />
           </div>
@@ -469,7 +486,7 @@ export function ConfigPage() {
             </Button>
             <Space className="flex items-center gap-2">
               <Button
-                onClick={() => getCurrentWindow().close().catch((error) => message.error(`关闭设置失败：${String(error)}`))}
+                onClick={handleClose}
                 className="!h-8 !px-3 !text-xs !font-medium !rounded-md !border-white/15 !bg-white/8 hover:!bg-white/15 active:!scale-95 !text-white/60 shadow-xs"
               >
                 取消

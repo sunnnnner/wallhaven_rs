@@ -130,11 +130,12 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
     if (wallpaperBusy.current) return
     wallpaperBusy.current = true
     setSettingWallpaper(true)
-    const hide = message.loading('正在设置桌面壁纸...', 0)
+    const isMobile = typeof navigator !== 'undefined' && /android|iphone|ipad|ipod/i.test(navigator.userAgent)
+    const hide = message.loading(isMobile ? '正在下载壁纸...' : '正在设置桌面壁纸...', 0)
     try {
       await setAsWallpaper(currentImage.full_url, currentImage.name)
       hide()
-      message.success('已成功设置为桌面壁纸！')
+      message.success(isMobile ? '壁纸下载成功，可在相册中设为手机壁纸！' : '已成功设置为桌面壁纸！')
     } catch (error) {
       hide()
       message.error(`设置壁纸失败：${String(error)}`)

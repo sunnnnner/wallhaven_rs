@@ -67,10 +67,12 @@ impl Config {
 impl Config {
     pub fn default_for(app: &AppHandle) -> Self {
         let download_path = app.path().picture_dir()
+            .or_else(|_| app.path().download_dir())
+            .or_else(|_| app.path().app_data_dir())
+            .or_else(|_| app.path().document_dir())
             .ok()
             .and_then(|p| p.to_str().map(|s| s.to_string()))
             .unwrap_or_else(|| {
-                // 如果获取图片目录失败，使用用户主目录下的 Pictures
                 let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
                 format!("{}/Pictures", home)
             });

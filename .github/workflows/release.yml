@@ -81,3 +81,79 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }} -- --locked
+
+  release-android:
+    name: Release Android APK
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-35 build-tools;35.0.0 ndk;26.1.10909125'
+
+      - name: Set Android environment variables
+        run: |
+          echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+          echo "NDK_HOME=/usr/local/lib/android/sdk/ndk/26.1.10909125" >> $GITHUB_ENV
+
+      - name: Rust setup
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          prefix-key: 'android-rust'
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.5.0
+          run_install: false
+
+      - name: Pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Android APK
+        env:
+          RUST_BACKTRACE: 1
+        run: |
+          pnpm tauri android build --apk --target aarch64,armv7,x86_64
+
+      - name: Organize APK outputs
+        run: |
+          mkdir -p output-apks
+          find src-tauri/gen/android/app/build/outputs/apk -name "*.apk" -exec cp {} output-apks/ \;
+          ls -la output-apks/
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Wallhaven-Android-APKs
+          path: output-apks/*.apk
+          if-no-files-found: error
+
+      - name: Upload APK to Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: output-apks/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

@@ -72,21 +72,30 @@ async fn set_as_wallpaper(app: AppHandle, url: String, file_name: String, contex
     let download = Download::new(url, file_name);
     let file_path = download.save(&app, context).await?;
 
-    let path_str = file_path.to_str().ok_or_else(|| {
-        crate::utils::error::Error::new("无效的文件路径")
-    })?;
+    #[cfg(not(target_os = "android"))]
+    {
+        let path_str = file_path.to_str().ok_or_else(|| {
+            crate::utils::error::Error::new("无效的文件路径")
+        })?;
 
-    wallpaper::set_from_path(path_str).map_err(|e| {
-        eprintln!("设置壁纸失败: {:?}", e);
-        crate::utils::error::Error::new(&format!("设置壁纸失败: {:?}", e))
-    })?;
+        wallpaper::set_from_path(path_str).map_err(|e| {
+            eprintln!("设置壁纸失败: {:?}", e);
+            crate::utils::error::Error::new(&format!("设置壁纸失败: {:?}", e))
+        })?;
 
-    let _ = wallpaper::set_mode(wallpaper::Mode::Crop);
+        let _ = wallpaper::set_mode(wallpaper::Mode::Crop);
 
-    println!("成功设置为桌面壁纸: {:?}", file_path);
-    Ok(())
+        println!("成功设置为桌面壁纸: {:?}", file_path);
+        Ok(())
+    }
+    #[cfg(target_os = "android")]
+    {
+        println!("Android 已下载壁纸至: {:?}", file_path);
+        Ok(())
+    }
 }
 
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[cfg(target_os = "linux")]
     {

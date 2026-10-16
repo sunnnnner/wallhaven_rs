@@ -40,6 +40,12 @@ export function HomeLayout() {
     if (openingSettings.current) return
     openingSettings.current = true
     try {
+      const isMobile = typeof navigator !== 'undefined' && (/android|iphone|ipad|ipod/i.test(navigator.userAgent) || window.innerWidth <= 768)
+      if (isMobile) {
+        navigate('/config')
+        return
+      }
+
       const existing = await WebviewWindow.getByLabel('theUniqueLabel')
       if (existing) {
         await existing.show()
@@ -58,8 +64,8 @@ export function HomeLayout() {
         void settings.once('tauri://created', () => resolve())
         void settings.once('tauri://error', (event) => reject(event.payload))
       })
-    } catch (error) {
-      message.error(`打开设置失败：${String(error)}`)
+    } catch {
+      navigate('/config')
     } finally {
       openingSettings.current = false
     }

@@ -689,6 +689,9 @@ html, body, #app {
   .action-section {
     margin-left: auto;
   }
+  .window-controls {
+    display: none !important;
+  }
   .wallpaper-browser {
     width: 100% !important;
     max-width: 100vw !important;

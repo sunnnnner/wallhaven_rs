@@ -5,7 +5,9 @@ description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "wallhaven_rs_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
 tauri-build = { version = "2.6.3", features = [] }
@@ -16,7 +18,7 @@ tauri-plugin-dialog = "2.7.3"
 tauri-plugin-shell = "2.3.6"
 serde = { version = "1.0.202", features = ["derive"] }
 serde_json = "1.0.117"
-reqwest = { version = "0.12.4", features = ["socks", "brotli", "gzip", "deflate"] }
+reqwest = { version = "0.12.4", default-features = false, features = ["rustls-tls", "socks", "brotli", "gzip", "deflate"] }
 http-cache-reqwest = "0.14.0"
 reqwest-middleware = "0.3.1"
 log = "^0.4"
@@ -25,6 +27,8 @@ thiserror = "1.0.61"
 toml = "0.8.13"
 url = "2.5.0"
 http = "1.1"
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
 wallpaper = "3.2.0"
 
 [features]
