@@ -79,6 +79,18 @@ jobs:
       - name: Run frontend tests
         run: pnpm test
 
+      - name: Ensure Android debug keystore
+        run: |
+          mkdir -p ~/.android ~/.config/.android
+          if [ ! -f src-tauri/gen/android/debug.keystore ]; then
+            keytool -genkeypair -v -keystore src-tauri/gen/android/debug.keystore \
+              -alias androiddebugkey -storepass android -keypass android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          cp src-tauri/gen/android/debug.keystore ~/.android/debug.keystore
+          cp src-tauri/gen/android/debug.keystore ~/.config/.android/debug.keystore
+
       - name: Build Android APK
         env:
           RUST_BACKTRACE: 1
