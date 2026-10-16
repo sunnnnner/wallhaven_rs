@@ -17,7 +17,7 @@ android {
     compileSdk = 35
     namespace = "cn.com.rustcc"
     defaultConfig {
-        manifestPlaceholders["usesCleartextTraffic"] = "false"
+        manifestPlaceholders["usesCleartextTraffic"] = "true"
         applicationId = "cn.com.rustcc"
         minSdk = 24
         targetSdk = 35
@@ -62,6 +62,7 @@ android {
             }
         }
         getByName("release") {
+            manifestPlaceholders["usesCleartextTraffic"] = "true"
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(

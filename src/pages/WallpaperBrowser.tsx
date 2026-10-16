@@ -28,11 +28,28 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
   const [error, setError] = useState('')
   const [downloading, setDownloading] = useState(false)
   const [settingWallpaper, setSettingWallpaper] = useState(false)
+  const [failedUrls, setFailedUrls] = useState<Set<string>>(new Set())
   const downloadBusy = useRef(false)
   const wallpaperBusy = useRef(false)
   const requestRef = useRef({ page: 1, busy: false, ended: false, active: false })
   const listRef = useRef<HTMLUListElement>(null)
   const resizeRef = useRef<{ startX: number; startWidth: number } | null>(null)
+
+  const handleImgError = (url: string) => {
+    setFailedUrls((prev) => {
+      const next = new Set(prev)
+      next.add(url)
+      return next
+    })
+  }
+
+  const getImageSrc = (url: string) => {
+    if (!url) return ''
+    if (failedUrls.has(url)) {
+      return url
+    }
+    return toDisplayImageUrl(url)
+  }
 
   const loadMore = useCallback(async () => {
     const request = requestRef.current
@@ -222,7 +239,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
   }
 
   return (
-    <div className="wallpaper-browser flex h-full w-full overflow-hidden bg-transparent relative">
+    <div className={`wallpaper-browser flex h-full w-full overflow-hidden bg-transparent relative ${currentImage ? 'has-preview' : ''}`}>
       {/* HaoWallpaper 风格平铺流式主画廊 (永远 100% 满屏展示，窗口内绝不分出任何上下左右固定区域) */}
       <aside className="left w-full h-full flex flex-col flex-1 min-w-0 overflow-hidden relative">
         {/* 顶部标题与状态 */}
@@ -291,10 +308,11 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                   >
                     <Image
                       className="thumbnail-image !w-full !h-full !object-cover group-hover:scale-106 transition-transform duration-500 ease-out pointer-events-none"
-                      src={toDisplayImageUrl(image.url)}
+                      src={getImageSrc(image.url)}
                       alt={image.name}
                       loading="lazy"
                       preview={false}
+                      onError={() => handleImgError(image.url)}
                     />
                   </button>
 
@@ -442,7 +460,15 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
             {/* 展台控制栏 */}
             <div className="toolbar flex items-center justify-between px-3 md:px-4 py-2.5 bg-white/5 border-b border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.02)] z-10 flex-wrap gap-2 max-w-full">
               <Space className="image-info flex items-center gap-1.5 overflow-hidden min-w-0">
-                <Tag className="!bg-white/15 !text-white !border-white/20 !backdrop-blur-md !rounded-md !text-xs !font-mono !px-2.5 !py-0.5 max-w-[140px] md:max-w-[180px] truncate font-medium">
+                <Button
+                  aria-label="返回列表"
+                  icon={<ArrowLeftOutlined className="text-xs" />}
+                  onClick={() => setCurrentName('')}
+                  className="!h-7 !px-2 !text-xs !font-medium !rounded-md !border-white/20 !bg-white/15 hover:!bg-white/25 !text-white active:!scale-95 transition-all shadow-xs inline-flex items-center gap-1"
+                >
+                  <span>返回</span>
+                </Button>
+                <Tag className="!bg-white/15 !text-white !border-white/20 !backdrop-blur-md !rounded-md !text-xs !font-mono !px-2.5 !py-0.5 max-w-[120px] md:max-w-[180px] truncate font-medium">
                   {currentImage.name}
                 </Tag>
                 <Tag color="default" className="!bg-[#E4B863]/20 !text-[#E4B863] !border-[#E4B863]/30 !backdrop-blur-md !rounded-md !text-xs !font-mono !px-2 !py-0.5 font-medium">
@@ -523,7 +549,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
               <div className="full-image-container flex-1 min-h-0 relative flex items-center justify-center p-3 md:p-6 overflow-hidden bg-black/50 cursor-context-menu">
                 <Image
                   key={currentImage.full_url}
-                  src={toDisplayImageUrl(currentImage.full_url)}
+                  src={getImageSrc(currentImage.full_url)}
                   alt={currentImage.name}
                   className="full-image shadow-[0_20px_50px_-15px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.12)] rounded-lg pointer-events-auto"
                   style={{ objectFit: fit }}
@@ -531,6 +557,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                   height="100%"
                   placeholder={<Spin size="medium" />}
                   preview={{ motionName: '' }}
+                  onError={() => handleImgError(currentImage.full_url)}
                 />
               </div>
             </Dropdown>

@@ -665,19 +665,25 @@ html, body, #app {
   }
 }
 
-@media (max-width: 700px) {
+/* 移动端专属底部导航栏 (默认桌面端隐藏) */
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* 顶部导航全面屏与安全区适配 */
   .app-header {
-    flex-wrap: wrap !important;
-    padding: 8px 12px !important;
-    height: auto !important;
-    min-height: 52px;
+    height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    padding-left: max(12px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(12px, env(safe-area-inset-right, 0px)) !important;
+    padding-bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
   }
-  .nav-menu {
-    min-width: 0 !important;
-    order: 3 !important;
-    flex-basis: 100% !important;
-    line-height: 36px !important;
-    justify-content: flex-start !important;
+  .app-header .nav-menu {
+    display: none !important;
   }
   .search-input {
     display: none !important;
@@ -688,13 +694,32 @@ html, body, #app {
   }
   .action-section {
     margin-left: auto;
+    gap: 6px !important;
   }
   .window-controls {
     display: none !important;
   }
+
+  /* 移动端底部沉浸式磨砂导航栏 */
+  .mobile-bottom-nav {
+    display: flex !important;
+    height: calc(50px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    padding-left: max(8px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(8px, env(safe-area-inset-right, 0px)) !important;
+    box-shadow: 0 -1px 0 0 rgba(255, 255, 255, 0.08), 0 -8px 24px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  /* 移动端主内容区域避让底部导航栏与安全区 */
+  .app-content {
+    padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* 壁纸画廊移动端全屏布局 */
   .wallpaper-browser {
     width: 100% !important;
     max-width: 100vw !important;
+    height: 100% !important;
     overflow: hidden !important;
   }
   .wallpaper-browser .left {
@@ -702,49 +727,113 @@ html, body, #app {
     max-width: 100vw !important;
   }
   .wallpaper-browser .left .sidebar-header {
-    padding: 8px !important;
-    flex-wrap: wrap !important;
-    gap: 6px !important;
+    padding: 8px 12px !important;
   }
   .wallpaper-browser .infinite-list {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 8px !important;
-    padding: 8px !important;
+    gap: 10px !important;
+    padding: 10px !important;
+    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)) !important;
   }
   .wallpaper-browser .thumbnail-container {
-    height: 110px !important;
-    min-height: 110px !important;
+    height: 180px !important;
+    min-height: 180px !important;
+    border-radius: 14px !important;
+  }
+  .thumbnail-overlay {
+    opacity: 1 !important;
+    padding: 6px 8px !important;
+    padding-top: 24px !important;
   }
   .wallpaper-browser .resize-handle {
     display: none !important;
   }
-  .wallpaper-browser .right-content {
-    width: 100% !important;
-    max-width: 100vw !important;
+
+  /* 移动端全屏超清大图展示层 (彻底覆盖全屏，完美沉浸体验) */
+  .wallpaper-browser.has-preview .left {
+    display: none !important;
+  }
+  .wallpaper-browser.has-preview .right-content {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    z-index: 100 !important;
+    background: #0B1322 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+    margin: 0 !important;
     border-left: 0 !important;
   }
-  .wallpaper-browser .right-content .toolbar,
-  .wallpaper-browser .right-content .bottom-controls {
-    padding: 8px !important;
+  .wallpaper-browser.has-preview .image-viewer {
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-width: 100vw !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .wallpaper-browser.has-preview .toolbar {
+    padding-top: max(10px, env(safe-area-inset-top, 0px)) !important;
+    padding-bottom: 8px !important;
+    padding-left: max(12px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(12px, env(safe-area-inset-right, 0px)) !important;
+    background: rgba(11, 19, 34, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    flex-wrap: wrap !important;
     gap: 8px !important;
   }
-  .wallpaper-browser .right-content .full-image-container {
-    padding: 8px !important;
+  .wallpaper-browser.has-preview .full-image-container {
+    flex: 1 !important;
+    height: 100% !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: black !important;
   }
-  .wallpaper-browser .ant-radio-button-wrapper {
-    padding: 0 6px !important;
+  .wallpaper-browser.has-preview .full-image {
+    max-width: 100vw !important;
+    max-height: calc(100dvh - 120px) !important;
+    object-fit: contain !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .wallpaper-browser.has-preview .bottom-controls {
+    padding-top: 8px !important;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
+    padding-left: max(12px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(12px, env(safe-area-inset-right, 0px)) !important;
+    background: rgba(11, 19, 34, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    gap: 8px !important;
   }
   .wallpaper-browser .image-info .ant-tag {
-    max-width: 130px !important;
+    max-width: 110px !important;
   }
-  .thumbnail-overlay {
-    opacity: 1 !important;
+
+  /* 设置页面全面屏与安全区适配 */
+  .config-header {
+    padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
+    padding-left: max(14px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(14px, env(safe-area-inset-right, 0px)) !important;
   }
   .config-content {
-    padding: 10px !important;
+    padding: 12px !important;
+    padding-bottom: max(32px, env(safe-area-inset-bottom, 0px)) !important;
   }
   .config-content > .ant-form {
     padding: 14px !important;
+    border-radius: 20px !important;
   }
 }
 

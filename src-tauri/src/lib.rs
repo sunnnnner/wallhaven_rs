@@ -120,6 +120,7 @@ pub fn run() {
                 });
 
                 let Some(img_url) = target_url else {
+                    eprintln!("wh-img 请求缺少 url 参数: {:?}", request.uri());
                     let resp = http::Response::builder()
                         .status(400)
                         .body(Vec::new())
@@ -149,13 +150,15 @@ pub fn run() {
                                     .unwrap();
                                 responder.respond(resp);
                             }
-                            Err(_) => {
+                            Err(e) => {
+                                eprintln!("读取图片数据失败: {} -> {:?}", img_url, e);
                                 let resp = http::Response::builder().status(502).body(Vec::new()).unwrap();
                                 responder.respond(resp);
                             }
                         }
                     }
-                    Err(_) => {
+                    Err(e) => {
+                        eprintln!("请求图片失败: {} -> {:?}", img_url, e);
                         let resp = http::Response::builder().status(502).body(Vec::new()).unwrap();
                         responder.respond(resp);
                     }

@@ -1,9 +1,10 @@
 import {
   BorderOutlined,
   CloseOutlined,
+  CompassOutlined,
+  FireOutlined,
   GithubOutlined,
   HomeOutlined,
-  MenuOutlined,
   MinusOutlined,
   ReloadOutlined,
   SearchOutlined,
@@ -21,8 +22,8 @@ import appLogo from '../static/logo.png'
 const items = [
   { key: '/index/latest', icon: <HomeOutlined aria-hidden className="text-white/50" />, label: '最新' },
   { key: '/index/top', icon: <ThunderboltOutlined aria-hidden className="text-white/50" />, label: '排行榜' },
-  { key: '/index/hot', icon: <MenuOutlined aria-hidden className="text-white/50" />, label: '热门' },
-  { key: '/index/random', icon: <ThunderboltOutlined aria-hidden className="text-white/50" />, label: '随机' },
+  { key: '/index/hot', icon: <FireOutlined aria-hidden className="text-white/50" />, label: '热门' },
+  { key: '/index/random', icon: <CompassOutlined aria-hidden className="text-white/50" />, label: '随机' },
 ]
 
 export function HomeLayout() {
@@ -192,6 +193,36 @@ export function HomeLayout() {
       <Layout.Content className="app-content min-h-0 flex-1 overflow-hidden bg-transparent">
         <Outlet />
       </Layout.Content>
+
+      {/* 移动端专属沉浸式底部导航栏 (极佳单手拇指触控，带安全区与设置直达入口) */}
+      <nav aria-label="移动端底部导航" className="mobile-bottom-nav fixed bottom-0 inset-x-0 z-40 flex items-center justify-around bg-[#0B1322]/90 backdrop-blur-xl border-t border-white/10 select-none">
+        {items.map((item) => {
+          const isActive = activeKey === item.key
+          return (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => navigate(item.key)}
+              className={`flex-1 flex flex-col items-center justify-center py-2 transition-all duration-200 border-0 bg-transparent cursor-pointer ${
+                isActive ? 'text-[#E4B863]' : 'text-white/50 hover:text-white/80'
+              }`}
+            >
+              <div className="text-base leading-none mb-1">{item.icon}</div>
+              <span className="text-[10px] font-medium leading-none">{item.label}</span>
+            </button>
+          )
+        })}
+        <button
+          type="button"
+          onClick={openConfig}
+          className="flex-1 flex flex-col items-center justify-center py-2 text-white/50 hover:text-[#E4B863] active:text-[#E4B863] transition-all duration-200 border-0 bg-transparent cursor-pointer"
+        >
+          <div className="text-base leading-none mb-1">
+            <SettingOutlined />
+          </div>
+          <span className="text-[10px] font-medium leading-none">设置</span>
+        </button>
+      </nav>
     </Layout>
   )
 }

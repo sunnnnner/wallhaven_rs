@@ -48,12 +48,19 @@ export function ConfigPage() {
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('basic')
   const [version, setVersion] = useState('')
+  const isMobile = typeof navigator !== 'undefined' && (/android|iphone|ipad|ipod/i.test(navigator.userAgent) || (typeof window !== 'undefined' && window.innerWidth <= 768))
 
   const handleClose = () => {
+    if (isMobile) {
+      navigate('/index/latest')
+      return
+    }
     if (window.history.length > 1) {
       navigate(-1)
     } else {
-      getCurrentWindow().close().catch(() => {})
+      getCurrentWindow().close().catch(() => {
+        navigate('/index/latest')
+      })
     }
   }
   const [testingProxy, setTestingProxy] = useState(false)
@@ -107,6 +114,10 @@ export function ConfigPage() {
   }, [form])
 
   const choosePath = async () => {
+    if (isMobile) {
+      message.info('移动端壁纸将自动保存至相册，默认无需手动修改')
+      return
+    }
     try {
       const path = await chooseDirectory({ directory: true, defaultPath: form.getFieldValue('download_path') || undefined })
       if (typeof path === 'string') form.setFieldValue('download_path', path)
@@ -136,15 +147,16 @@ export function ConfigPage() {
   }
 
   const submit = async (values: FormValues) => {
-    if (!values.download_path) {
+    if (!values.download_path && !isMobile) {
       message.warning('请先选择下载保存路径')
       return
     }
+    const downloadPath = values.download_path || ''
     const proxyValue = values.enable_proxy && values.proxy ? values.proxy.trim() : undefined
     setSaving(true)
     try {
-      await saveDownloadPath(values.download_path, proxyValue)
-      message.success('下载保存路径已保存')
+      await saveDownloadPath(downloadPath, proxyValue)
+      message.success('设置已保存')
     } catch (error) {
       message.error(`设置保存失败：${String(error)}`)
     } finally {
@@ -167,13 +179,18 @@ export function ConfigPage() {
   const basic = (
     <Form.Item label="下载保存路径" required className="mb-4">
       <Space.Compact block className="flex shadow-xs">
-        <Form.Item name="download_path" noStyle rules={[{ required: true, message: '请选择下载保存路径' }]}>
-          <Input readOnly aria-label="下载保存路径" placeholder="选择保存路径" className="!bg-white/6 !text-xs !border-white/12 !text-white/80" />
+        <Form.Item name="download_path" noStyle rules={[{ required: !isMobile, message: '请选择下载保存路径' }]}>
+          <Input readOnly={!isMobile} aria-label="下载保存路径" placeholder={isMobile ? "默认保存至系统图片相册" : "选择保存路径"} className="!bg-white/6 !text-xs !border-white/12 !text-white/80" />
         </Form.Item>
         <Button aria-label="选择路径" icon={<FolderOpenOutlined aria-hidden />} onClick={choosePath} className="!text-xs !font-medium !border-white/12 !bg-white/8 hover:!bg-white/15 !text-white/70">
-          选择路径
+          {isMobile ? '相册位置' : '选择路径'}
         </Button>
       </Space.Compact>
+      {isMobile && (
+        <div className="text-[11px] text-white/40 mt-1.5 flex items-center gap-1">
+          <InfoCircleOutlined /> 移动端下载壁纸将自动保存至相册，默认无需手动修改
+        </div>
+      )}
     </Form.Item>
   )
 
@@ -184,10 +201,10 @@ export function ConfigPage() {
         <div className="flex items-center gap-2.5">
           <Button
             type="text"
-            icon={<ArrowLeftOutlined className="text-white/70" />}
+            icon={<ArrowLeftOutlined className="text-white/80 text-base" />}
             onClick={handleClose}
             aria-label="返回"
-            className="!h-7 !w-7 !min-w-7 !p-0 !rounded-lg !border-transparent !bg-white/4 hover:!bg-white/10 !text-white/70 active:!scale-95"
+            className="!h-8 !w-8 !min-w-8 !p-0 !rounded-xl !border-transparent !bg-white/6 hover:!bg-white/12 !text-white/80 active:!scale-95 flex items-center justify-center cursor-pointer"
           />
           <div className="w-7 h-7 rounded-lg bg-[#E4B863] text-[#0B1322] flex items-center justify-center shadow-xs">
             <SettingOutlined className="text-xs" />
