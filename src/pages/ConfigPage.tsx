@@ -52,16 +52,20 @@ export function ConfigPage() {
 
   const handleClose = () => {
     if (isMobile) {
-      navigate('/index/latest')
+      if (window.history.length > 1) {
+        navigate(-1)
+      } else {
+        navigate('/index/latest')
+      }
       return
     }
-    if (window.history.length > 1) {
-      navigate(-1)
-    } else {
-      getCurrentWindow().close().catch(() => {
+    getCurrentWindow().close().catch(() => {
+      if (window.history.length > 1) {
+        navigate(-1)
+      } else {
         navigate('/index/latest')
-      })
-    }
+      }
+    })
   }
   const [testingProxy, setTestingProxy] = useState(false)
   const [proxyLatency, setProxyLatency] = useState<number | null>(null)
@@ -114,15 +118,18 @@ export function ConfigPage() {
   }, [form])
 
   const choosePath = async () => {
-    if (isMobile) {
-      message.info('移动端壁纸将自动保存至相册，默认无需手动修改')
-      return
-    }
     try {
       const path = await chooseDirectory({ directory: true, defaultPath: form.getFieldValue('download_path') || undefined })
-      if (typeof path === 'string') form.setFieldValue('download_path', path)
+      if (typeof path === 'string') {
+        form.setFieldValue('download_path', path)
+        return
+      }
     } catch (error) {
-      message.error(`选择路径失败：${String(error)}`)
+      if (isMobile) {
+        message.info('可直接手动输入手机存储路径，或点击下方常用位置')
+      } else {
+        message.error(`选择路径失败：${String(error)}`)
+      }
     }
   }
 
@@ -147,16 +154,16 @@ export function ConfigPage() {
   }
 
   const submit = async (values: FormValues) => {
-    if (!values.download_path && !isMobile) {
-      message.warning('请先选择下载保存路径')
+    const downloadPath = (values.download_path || '').trim()
+    if (!downloadPath) {
+      message.warning('请先输入或选择下载保存路径')
       return
     }
-    const downloadPath = values.download_path || ''
     const proxyValue = values.enable_proxy && values.proxy ? values.proxy.trim() : undefined
     setSaving(true)
     try {
       await saveDownloadPath(downloadPath, proxyValue)
-      message.success('设置已保存')
+      message.success('下载保存路径已保存')
     } catch (error) {
       message.error(`设置保存失败：${String(error)}`)
     } finally {
@@ -178,41 +185,77 @@ export function ConfigPage() {
 
   const basic = (
     <Form.Item label="下载保存路径" required className="mb-4">
-      <Space.Compact block className="flex shadow-xs">
-        <Form.Item name="download_path" noStyle rules={[{ required: !isMobile, message: '请选择下载保存路径' }]}>
-          <Input readOnly={!isMobile} aria-label="下载保存路径" placeholder={isMobile ? "默认保存至系统图片相册" : "选择保存路径"} className="!bg-white/6 !text-xs !border-white/12 !text-white/80" />
+      <Space.Compact block className="flex shadow-xs max-w-lg">
+        <Form.Item name="download_path" noStyle rules={[{ required: true, message: '请选择或输入下载保存路径' }]}>
+          <Input
+            aria-label="下载保存路径"
+            placeholder={isMobile ? "输入或选择存储路径，如 /storage/emulated/0/Pictures" : "选择或输入保存路径"}
+            allowClear
+            className="!bg-white/6 !text-xs !border-white/12 !text-white/80"
+          />
         </Form.Item>
-        <Button aria-label="选择路径" icon={<FolderOpenOutlined aria-hidden />} onClick={choosePath} className="!text-xs !font-medium !border-white/12 !bg-white/8 hover:!bg-white/15 !text-white/70">
-          {isMobile ? '相册位置' : '选择路径'}
+        <Button
+          aria-label="选择路径"
+          icon={<FolderOpenOutlined aria-hidden />}
+          onClick={choosePath}
+          className="!text-xs !font-medium !border-white/12 !bg-white/8 hover:!bg-white/15 !text-white/80"
+        >
+          选择路径
         </Button>
       </Space.Compact>
-      {isMobile && (
-        <div className="text-[11px] text-white/40 mt-1.5 flex items-center gap-1">
-          <InfoCircleOutlined /> 移动端下载壁纸将自动保存至相册，默认无需手动修改
-        </div>
-      )}
+      {/* 常用位置预设快捷填入胶囊（支持移动端触屏快速一键切换保存目录） */}
+      <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
+        <span className="text-[11px] text-white/40">常用位置:</span>
+        <Button
+          size="small"
+          type="dashed"
+          onClick={() => form.setFieldValue('download_path', isMobile ? '/storage/emulated/0/Pictures' : '/tmp/Pictures')}
+          className="!text-[11px] !h-6 !px-2.5 !rounded-full !border-white/15 !bg-white/5 hover:!bg-white/10 !text-white/80"
+        >
+          {isMobile ? '系统相册 (Pictures)' : '图片相册'}
+        </Button>
+        <Button
+          size="small"
+          type="dashed"
+          onClick={() => form.setFieldValue('download_path', isMobile ? '/storage/emulated/0/Download' : '/tmp/Wallpapers')}
+          className="!text-[11px] !h-6 !px-2.5 !rounded-full !border-white/15 !bg-white/5 hover:!bg-white/10 !text-white/80"
+        >
+          {isMobile ? '下载目录 (Download)' : '下载目录'}
+        </Button>
+        <Button
+          size="small"
+          type="dashed"
+          onClick={() => form.setFieldValue('download_path', isMobile ? '/storage/emulated/0/DCIM/Wallpapers' : '/tmp/DCIM')}
+          className="!text-[11px] !h-6 !px-2.5 !rounded-full !border-white/15 !bg-white/5 hover:!bg-white/10 !text-white/80"
+        >
+          {isMobile ? 'DCIM 相机壁纸' : '壁纸专区'}
+        </Button>
+      </div>
+      <div className="text-[11px] text-white/40 mt-1.5 flex items-center gap-1">
+        <InfoCircleOutlined /> 支持自定义目录，下载壁纸时将自动创建并保存至该位置
+      </div>
     </Form.Item>
   )
 
   return (
-    <Layout className="config-page min-h-screen bg-[#0B1322]">
+    <Layout className="config-page min-h-screen bg-[#10131A]">
       {contextHolder}
-      <div className="config-header sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-3.5 bg-white/5 backdrop-blur-[40px] backdrop-saturate-[180%] border-b border-white/8 shadow-[0_1px_0_0_rgba(255,255,255,0.05)_inset,0_4px_12px_-2px_rgba(0,0,0,0.3)]">
+      <div className="config-header sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-3 bg-[#161921] border-b border-white/8 shadow-xs">
         <div className="flex items-center gap-2.5">
           <Button
             type="text"
             icon={<ArrowLeftOutlined className="text-white/80 text-base" />}
             onClick={handleClose}
             aria-label="返回"
-            className="!h-8 !w-8 !min-w-8 !p-0 !rounded-xl !border-transparent !bg-white/6 hover:!bg-white/12 !text-white/80 active:!scale-95 flex items-center justify-center cursor-pointer"
+            className="!h-8 !w-8 !min-w-8 !p-0 !rounded-full !border-transparent !bg-white/6 hover:!bg-white/12 !text-white/80 active:!scale-95 flex items-center justify-center cursor-pointer"
           />
-          <div className="w-7 h-7 rounded-lg bg-[#E4B863] text-[#0B1322] flex items-center justify-center shadow-xs">
+          <div className="w-7 h-7 rounded-full bg-[#1E3A5F] text-[#D3E3FD] border border-white/12 flex items-center justify-center shadow-xs">
             <SettingOutlined className="text-xs" />
           </div>
           <h2 className="text-sm font-semibold tracking-tight text-white/90 m-0">应用设置</h2>
         </div>
         {version && (
-          <Tag className="!bg-white/8 !text-white/50 !border-white/15 !rounded-full !text-[11px] !font-mono !px-2.5 !m-0">
+          <Tag className="!bg-white/8 !text-white/60 !border-white/10 !rounded-full !text-[11px] !font-mono !px-2.5 !m-0">
             v{version}
           </Tag>
         )}
@@ -227,10 +270,10 @@ export function ConfigPage() {
           onFinish={submit}
           onFinishFailed={() => setActiveTab('basic')}
           initialValues={defaults}
-          className="!bg-white/5 !backdrop-blur-[40px] !backdrop-saturate-[180%] !border !border-white/10 !rounded-3xl !p-6 !shadow-[0_4px_24px_rgba(0,0,0,0.3),0_1px_0_0_rgba(255,255,255,0.05)_inset,0_-1px_0_0_rgba(0,0,0,0.3)_inset]"
+          className="!bg-[#1C2028] !border !border-white/10 !rounded-[24px] !p-6 !shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
         >
-          <div className="form-hint persistence-note flex items-center gap-2 p-2.5 mb-5 rounded-2xl bg-white/4 border border-white/8 text-xs text-white/50">
-            <InfoCircleOutlined className="text-white/30" />
+          <div className="form-hint persistence-note flex items-center gap-2 p-3 mb-5 rounded-2xl bg-[#222630] border border-white/8 text-xs text-white/60">
+            <InfoCircleOutlined className="text-white/40" />
             <span>当前仅下载保存路径与网络代理设置会保存并生效。</span>
           </div>
 
@@ -315,8 +358,8 @@ export function ConfigPage() {
                               </Space.Compact>
                             </Form.Item>
                             {proxyLatency !== null && (
-                              <div className="flex items-center gap-2 pl-[110px] pb-2 text-xs text-[#E4B863] font-mono">
-                                <span className="inline-block w-2 h-2 rounded-full bg-[#E4B863] animate-pulse" />
+                              <div className="flex items-center gap-2 pl-[110px] pb-2 text-xs text-emerald-400 font-mono">
+                                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                                 <span>连通性良好，响应耗时: {proxyLatency} ms</span>
                               </div>
                             )}
@@ -326,7 +369,7 @@ export function ConfigPage() {
                                 size="small"
                                 type="dashed"
                                 onClick={() => form.setFieldValue('proxy', 'http://127.0.0.1:7890')}
-                                className="!text-[11px] !h-6 !px-2 !rounded-md"
+                                className="!text-[11px] !h-6 !px-2.5 !rounded-full !border-white/15 !bg-white/5 hover:!bg-white/10 !text-white/80"
                               >
                                 Clash (7890)
                               </Button>
@@ -334,7 +377,7 @@ export function ConfigPage() {
                                 size="small"
                                 type="dashed"
                                 onClick={() => form.setFieldValue('proxy', 'http://127.0.0.1:10808')}
-                                className="!text-[11px] !h-6 !px-2 !rounded-md"
+                                className="!text-[11px] !h-6 !px-2.5 !rounded-full !border-white/15 !bg-white/5 hover:!bg-white/10 !text-white/80"
                               >
                                 v2ray (10808)
                               </Button>
@@ -342,7 +385,7 @@ export function ConfigPage() {
                                 size="small"
                                 type="dashed"
                                 onClick={() => form.setFieldValue('proxy', 'socks5://127.0.0.1:1080')}
-                                className="!text-[11px] !h-6 !px-2 !rounded-md"
+                                className="!text-[11px] !h-6 !px-2.5 !rounded-full !border-white/15 !bg-white/5 hover:!bg-white/10 !text-white/80"
                               >
                                 SOCKS5 (1080)
                               </Button>
@@ -431,14 +474,14 @@ export function ConfigPage() {
                         type="primary"
                         icon={<GithubOutlined />}
                         onClick={() => open('https://github.com/sunnnnner/wallhaven_rs').catch((error) => message.error(`打开链接失败：${String(error)}`))}
-                        className="!h-7 !px-3.5 !text-xs !font-medium !rounded-md !bg-[#E4B863] hover:!bg-[#d4a853] !text-[#0B1322] active:!scale-95 shadow-xs"
+                        className="!h-7 !px-4 !text-xs !font-semibold !rounded-full !bg-[#A8C7FA] hover:!bg-[#C2E7FF] !text-[#062E6F] active:!scale-95 shadow-xs border-0"
                       >
                         GitHub 源码
                       </Button>
                       <Button
                         icon={<LinkOutlined />}
                         onClick={() => message.info('文档页面开发中...')}
-                        className="!h-7 !px-3.5 !text-xs !font-medium !rounded-md !border-white/15 !bg-white/8 hover:!bg-white/15 !text-white/70 active:!scale-95 shadow-xs"
+                        className="!h-7 !px-3.5 !text-xs !font-medium !rounded-full !border-white/15 !bg-white/8 hover:!bg-white/15 !text-white/70 active:!scale-95 shadow-xs"
                       >
                         使用文档
                       </Button>
@@ -463,7 +506,7 @@ export function ConfigPage() {
                                   e.preventDefault()
                                   open('https://github.com/sunnnnner/wallhaven_rs').catch((error) => message.error(`打开链接失败：${String(error)}`))
                                 }}
-                                className="text-[#E4B863] hover:underline inline-flex items-center gap-1.5 font-mono text-[11px]"
+                                className="text-white hover:underline inline-flex items-center gap-1.5 font-mono text-[11px]"
                               >
                                 <GithubOutlined className="text-xs" />
                                 <span>sunnnnner/wallhaven_rs</span>
@@ -497,14 +540,14 @@ export function ConfigPage() {
           <div className="config-footer flex items-center justify-between pt-5 mt-4 border-t border-white/8">
             <Button
               onClick={reset}
-              className="!h-8 !px-3 !text-xs !font-medium !rounded-md !border-white/15 !bg-white/8 hover:!bg-white/15 active:!scale-95 !text-white/60 shadow-xs"
+              className="!h-8 !px-4 !text-xs !font-medium !rounded-full !border-white/15 !bg-white/8 hover:!bg-white/15 active:!scale-95 !text-white/60 shadow-xs"
             >
               恢复默认
             </Button>
             <Space className="flex items-center gap-2">
               <Button
                 onClick={handleClose}
-                className="!h-8 !px-3 !text-xs !font-medium !rounded-md !border-white/15 !bg-white/8 hover:!bg-white/15 active:!scale-95 !text-white/60 shadow-xs"
+                className="!h-8 !px-4 !text-xs !font-medium !rounded-full !border-white/15 !bg-white/8 hover:!bg-white/15 active:!scale-95 !text-white/60 shadow-xs"
               >
                 取消
               </Button>
@@ -512,7 +555,7 @@ export function ConfigPage() {
                 type="primary"
                 htmlType="submit"
                 loading={saving}
-                className="!h-8 !px-4 !text-xs !font-medium !rounded-md !bg-[#E4B863] hover:!bg-[#d4a853] !text-[#0B1322] active:!scale-95 shadow-xs"
+                className="!h-8 !px-5 !text-xs !font-semibold !rounded-full !bg-[#A8C7FA] hover:!bg-[#C2E7FF] !text-[#062E6F] active:!scale-95 shadow-xs border-0"
               >
                 保存设置
               </Button>

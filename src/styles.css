@@ -1,16 +1,39 @@
 @import "tailwindcss";
 
-/* 添加噪点纹理 */
-.app-layout::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
+/* Material Design 3 (Material You / M3) 核心设计系统与色彩 Token 体系 */
+:root {
+  /* M3 动态主色系 */
+  --md-sys-color-primary: #A8C7FA;
+  --md-sys-color-on-primary: #062E6F;
+  --md-sys-color-primary-container: #1E3A5F;
+  --md-sys-color-on-primary-container: #D3E3FD;
+
+  /* M3 表面与容器色阶体系 (Surface & Containers) */
+  --md-sys-color-surface: #10131A;
+  --md-sys-color-surface-dim: #0E1014;
+  --md-sys-color-surface-container-lowest: #0B0E14;
+  --md-sys-color-surface-container-low: #161921;
+  --md-sys-color-surface-container: #1C2028;
+  --md-sys-color-surface-container-high: #222630;
+  --md-sys-color-surface-container-highest: #292E3A;
+
+  /* M3 文字与文本层级 (On Surface) */
+  --md-sys-color-on-surface: #E2E2E9;
+  --md-sys-color-on-surface-variant: #C4C6D0;
+  --md-sys-color-outline: rgba(255, 255, 255, 0.12);
+  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.08);
+
+  /* M3 形状圆角尺度规范 (Corner Radius) */
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 24px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* M3 动效曲线 (Standard Easing) */
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-duration-short: 150ms;
+  --md-sys-motion-duration-medium: 250ms;
 }
 
 /* 现代系统字体与渲染优化 */
@@ -18,9 +41,9 @@ html, body, #app {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0B1322;
-  color: rgba(255, 255, 255, 0.9);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Google Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden !important;
@@ -31,28 +54,28 @@ html, body, #app {
   box-sizing: border-box;
 }
 
-/* 现代极简细滚动条 (Linear / macOS 风格) */
+/* 极简细滚动条 */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
-  transition: background 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: var(--md-sys-shape-corner-full);
+  transition: background var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.25);
 }
 
-/* 全局布局骨架 (Nocturne Glassmorphism 极简大气氛围光) */
+/* 全局布局骨架 (M3 表面基底) */
 .app-layout, .config-page {
   min-height: 100%;
   height: 100%;
-  background-color: #0B1322;
+  background-color: var(--md-sys-color-surface);
 }
 
 .app-layout {
@@ -60,28 +83,21 @@ html, body, #app {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -12%, rgba(56, 130, 200, 0.12), transparent 70%),
-    radial-gradient(circle 600px at 100% 0%, rgba(56, 130, 200, 0.06), transparent 60%),
-    radial-gradient(circle 400px at 0% 80%, rgba(228, 184, 99, 0.04), transparent 60%),
-    #0B1322;
+  background-color: var(--md-sys-color-surface);
 }
 
-/* 顶部导航栏 (Nocturne 现代透光磨砂玻璃导航) */
+/* M3 顶部应用栏 (Top App Bar: 56px, Surface Container Low, 无刺眼投影) */
 .app-header {
   display: flex;
   align-items: center;
   gap: 16px;
   height: 56px;
   padding: 0 20px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
-    0 -1px 0 0 rgba(0, 0, 0, 0.3) inset,
-    0 4px 20px -2px rgba(0, 0, 0, 0.4);
+  background: rgba(22, 25, 33, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset;
   flex-shrink: 0;
   line-height: normal;
   z-index: 30;
@@ -92,45 +108,44 @@ html, body, #app {
 .brand-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   min-width: 170px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--md-sys-color-on-surface);
   user-select: none;
 }
 
 .brand-mark {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  transition: transform var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized);
 }
 
 .brand-section:hover .brand-mark {
-  transform: scale(1.1);
-  box-shadow: none !important;
+  transform: scale(1.05);
 }
 
 .app-title {
   font-size: 14px;
   line-height: 1.2;
   font-weight: 600;
-  letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.01em;
+  color: var(--md-sys-color-on-surface);
 }
 
 .app-subtitle {
   margin-top: 1px;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: -0.01em;
+  color: var(--md-sys-color-on-surface-variant);
+  letter-spacing: 0.02em;
 }
 
-/* 导航菜单 */
+/* M3 导航胶囊菜单 (Pill Tabs) */
 .nav-menu {
   flex: 1;
   min-width: 280px;
@@ -139,22 +154,25 @@ html, body, #app {
 }
 
 .nav-menu .ant-menu-item {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
   font-size: 13px !important;
   font-weight: 500 !important;
-  border-radius: 16px !important;
-  margin: 0 2px !important;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
+  margin: 0 4px !important;
+  padding: 0 16px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  transition: all var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized) !important;
 }
 
 .nav-menu .ant-menu-item:hover {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--md-sys-color-on-surface) !important;
   background: rgba(255, 255, 255, 0.06) !important;
 }
 
 .nav-menu .ant-menu-item-selected {
-  color: rgba(255, 255, 255, 0.95) !important;
-  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--md-sys-color-on-primary-container) !important;
+  background: var(--md-sys-color-primary-container) !important;
   font-weight: 600 !important;
 }
 
@@ -171,17 +189,16 @@ html, body, #app {
 
 .action-section .ant-btn {
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-  border-radius: 16px;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
+  border-radius: var(--md-sys-shape-corner-full);
+  transition: all var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized);
 }
 
 .action-section .ant-btn:hover {
   background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.9);
+  border-color: var(--md-sys-color-outline);
+  color: var(--md-sys-color-on-surface);
   transform: translateY(-1px);
 }
 
@@ -189,36 +206,41 @@ html, body, #app {
   transform: translateY(0);
 }
 
+/* M3 胶囊搜索框 */
 .search-input {
-  width: 200px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 210px;
+  height: 36px !important;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-full) !important;
+  padding: 0 14px;
+  transition: all var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized);
 }
 
 .search-input:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--md-sys-color-surface-container);
+  border-color: var(--md-sys-color-outline);
 }
 
 .search-input.ant-input-affix-wrapper-focused {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #E4B863 !important;
-  box-shadow: 0 0 0 2px rgba(228, 184, 99, 0.15) !important;
+  background: var(--md-sys-color-surface-container-high);
+  border-color: var(--md-sys-color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(168, 199, 250, 0.25) !important;
 }
 
 .search-input input {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--md-sys-color-on-surface);
   background: transparent;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .search-input input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--md-sys-color-on-surface-variant);
+  opacity: 0.6;
 }
 
 .search-input .ant-input-prefix {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--md-sys-color-on-surface-variant);
   margin-right: 8px;
 }
 
@@ -263,7 +285,11 @@ html, body, #app {
 }
 
 .wallpaper-browser .right-content .image-viewer {
-  pointer-events: auto !important;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
 }
 
 .wallpaper-browser .resize-handle {
@@ -271,7 +297,7 @@ html, body, #app {
   height: 100%;
   cursor: col-resize;
   background-color: rgba(255, 255, 255, 0.05);
-  transition: background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized);
   touch-action: none;
   flex-shrink: 0;
   z-index: 26;
@@ -279,7 +305,7 @@ html, body, #app {
 
 .wallpaper-browser .resize-handle:hover,
 .wallpaper-browser .resize-handle:focus-visible {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.12);
   outline: none;
 }
 
@@ -289,63 +315,52 @@ html, body, #app {
   overflow-y: auto;
   overflow-x: hidden;
   margin: 0;
-  padding: 20px;
+  padding: 24px;
   list-style: none;
-  /* 启用 GPU 硬件加速与滚动合成图层 */
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  will-change: scroll-position;
+  background: transparent;
   contain: layout paint;
-  /* 现代科技微点阵环境纹理 */
-  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 24px 24px;
 }
 
-/* HaoWallpaper 卡片入场动效 (GPU 硬件加速) */
+/* 平滑轻盈卡片入场动效 */
 @keyframes haoCardIn {
   from {
     opacity: 0;
-    transform: translate3d(0, 16px, 0) scale(0.97);
+    transform: translate3d(0, 10px, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 .card-stagger-in {
-  animation: haoCardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation: haoCardIn var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized) backwards;
   transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  will-change: transform, box-shadow;
 }
 
-/* 壁纸卡片现代物理光影与立体浮空系统 */
+/* M3 Filled/Elevated 卡片规范 (Surface Container, 16px 圆角, 细轮廓边框) */
 .wallpaper-browser .thumbnail-container {
   position: relative;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 
-    0 6px 16px -4px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 0 rgba(0, 0, 0, 0.3);
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--md-sys-color-surface-container);
+  border-radius: var(--md-sys-shape-corner-large);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized),
+              box-shadow var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized),
+              border-color var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized);
 }
 
 .wallpaper-browser .thumbnail-container:hover {
-  transform: translate3d(0, -6px, 0) scale(1.01);
-  border-color: rgba(228, 184, 99, 0.4);
-  box-shadow: 
-    0 0 15px rgba(228, 184, 99, 0.15),
-    0 22px 35px -8px rgba(0, 0, 0, 0.5),
-    0 10px 18px -4px rgba(0, 0, 0, 0.3),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translate3d(0, -3px, 0);
+  background: var(--md-sys-color-surface-container-high);
+  border-color: var(--md-sys-color-outline);
+  box-shadow: 0 10px 20px -4px rgba(0, 0, 0, 0.5);
   z-index: 10;
+}
+
+.wallpaper-browser .thumbnail-container.selected {
+  border-color: var(--md-sys-color-primary) !important;
+  box-shadow: 0 0 0 2px var(--md-sys-color-primary), 0 10px 20px -4px rgba(0, 0, 0, 0.5) !important;
 }
 
 .thumbnail-image {
@@ -372,79 +387,14 @@ html, body, #app {
 }
 
 .thumbnail-wrapper {
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   position: relative;
   overflow: hidden;
-}
-
-/* 卡片顶部高光微反光线 */
-.thumbnail-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
-  pointer-events: none;
-  z-index: 15;
-}
-
-/* 鼠标悬停时的水晶光感掠影 (Shimmer Highlight) */
-.thumbnail-wrapper::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -130%;
-  width: 80%;
-  height: 100%;
-  background: linear-gradient(
-    105deg,
-    transparent 20%,
-    rgba(255, 255, 255, 0.12) 50%,
-    transparent 80%
-  );
-  transform: skewX(-20deg);
-  pointer-events: none;
-  z-index: 14;
-  opacity: 0;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.thumbnail-wrapper:hover::before {
-  opacity: 1;
-  animation: cardShimmer 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes cardShimmer {
-  0% {
-    left: -130%;
-  }
-  100% {
-    left: 170%;
-  }
-}
-
-.full-image-container,
-.full-image {
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.thumbnail-wrapper > .thumbnail-select > .ant-image {
-  width: 100%;
-  height: 100%;
-  display: block;
+  border-radius: var(--md-sys-shape-corner-large);
 }
 
 .thumbnail-overlay {
   z-index: 2;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity var(--md-sys-motion-duration-medium) var(--md-sys-motion-easing-emphasized);
 }
 
 .thumbnail-wrapper:hover .thumbnail-overlay,
@@ -477,19 +427,25 @@ html, body, #app {
 }
 
 .full-image {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .full-image img {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  width: 100% !important;
+  height: 100% !important;
   object-fit: inherit;
 }
 
 .full-image-container .ant-image {
   display: block;
   min-width: 0;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .full-image-container .ant-image-placeholder {
@@ -520,7 +476,7 @@ html, body, #app {
 /* 设置页面 (Nocturne Glassmorphism 深色风格) */
 .config-page {
   overflow: auto;
-  background-color: #0B1322;
+  background-color: #0d0e11;
 }
 
 .config-header {
@@ -700,19 +656,22 @@ html, body, #app {
     display: none !important;
   }
 
-  /* 移动端底部沉浸式磨砂导航栏 */
+  /* 移动端底部 M3 沉浸式导航栏 (Navigation Bar 规范) */
   .mobile-bottom-nav {
     display: flex !important;
-    height: calc(50px + env(safe-area-inset-bottom, 0px)) !important;
+    height: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
     padding-bottom: env(safe-area-inset-bottom, 0px) !important;
     padding-left: max(8px, env(safe-area-inset-left, 0px)) !important;
     padding-right: max(8px, env(safe-area-inset-right, 0px)) !important;
-    box-shadow: 0 -1px 0 0 rgba(255, 255, 255, 0.08), 0 -8px 24px rgba(0, 0, 0, 0.5) !important;
+    background: rgba(22, 25, 33, 0.96) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    box-shadow: 0 -1px 0 0 var(--md-sys-color-outline-variant), 0 -8px 24px rgba(0, 0, 0, 0.5) !important;
   }
 
   /* 移动端主内容区域避让底部导航栏与安全区 */
   .app-content {
-    padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   /* 壁纸画廊移动端全屏布局 */
@@ -731,14 +690,14 @@ html, body, #app {
   }
   .wallpaper-browser .infinite-list {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 10px !important;
-    padding: 10px !important;
-    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: 12px !important;
+    padding: 12px !important;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
   }
   .wallpaper-browser .thumbnail-container {
     height: 180px !important;
     min-height: 180px !important;
-    border-radius: 14px !important;
+    border-radius: var(--md-sys-shape-corner-large) !important;
   }
   .thumbnail-overlay {
     opacity: 1 !important;
@@ -759,7 +718,7 @@ html, body, #app {
     width: 100vw !important;
     height: 100dvh !important;
     z-index: 100 !important;
-    background: #0B1322 !important;
+    background: var(--md-sys-color-surface) !important;
     display: flex !important;
     flex-direction: column !important;
     padding: 0 !important;
@@ -783,10 +742,10 @@ html, body, #app {
     padding-bottom: 8px !important;
     padding-left: max(12px, env(safe-area-inset-left, 0px)) !important;
     padding-right: max(12px, env(safe-area-inset-right, 0px)) !important;
-    background: rgba(11, 19, 34, 0.95) !important;
+    background: rgba(28, 32, 40, 0.95) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant) !important;
     flex-wrap: wrap !important;
     gap: 8px !important;
   }
@@ -811,10 +770,10 @@ html, body, #app {
     padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)) !important;
     padding-left: max(12px, env(safe-area-inset-left, 0px)) !important;
     padding-right: max(12px, env(safe-area-inset-right, 0px)) !important;
-    background: rgba(11, 19, 34, 0.95) !important;
+    background: rgba(28, 32, 40, 0.95) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-top: 1px solid var(--md-sys-color-outline-variant) !important;
     gap: 8px !important;
   }
   .wallpaper-browser .image-info .ant-tag {
@@ -832,8 +791,8 @@ html, body, #app {
     padding-bottom: max(32px, env(safe-area-inset-bottom, 0px)) !important;
   }
   .config-content > .ant-form {
-    padding: 14px !important;
-    border-radius: 20px !important;
+    padding: 16px !important;
+    border-radius: var(--md-sys-shape-corner-extra-large) !important;
   }
 }
 
@@ -842,183 +801,201 @@ html, body, #app {
   max-width: 90vw !important;
 }
 
-/* Ant Design 全局深色玻璃适配 */
+/* Ant Design 全局 M3 (Material Design 3) 设计系统适配 */
 .ant-btn-default {
-  background: rgba(255,255,255,0.06) !important;
-  border-color: rgba(255,255,255,0.12) !important;
-  color: rgba(255,255,255,0.7) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--md-sys-color-outline-variant) !important;
+  color: var(--md-sys-color-on-surface) !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
 }
 .ant-btn-default:hover {
-  background: rgba(255,255,255,0.12) !important;
-  border-color: rgba(255,255,255,0.2) !important;
-  color: rgba(255,255,255,0.9) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: var(--md-sys-color-outline) !important;
+  color: #ffffff !important;
 }
 .ant-btn-primary {
-  background: #E4B863 !important;
-  border-color: #E4B863 !important;
-  color: #0B1322 !important;
+  background: var(--md-sys-color-primary) !important;
+  border-color: var(--md-sys-color-primary) !important;
+  color: var(--md-sys-color-on-primary) !important;
+  font-weight: 600 !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
 }
 .ant-btn-primary:hover {
-  background: #d4a853 !important;
-  border-color: #d4a853 !important;
+  background: #C2E7FF !important;
+  border-color: #C2E7FF !important;
+  color: var(--md-sys-color-on-primary) !important;
 }
 .ant-input, .ant-input-number {
-  background: rgba(255,255,255,0.06) !important;
-  border-color: rgba(255,255,255,0.12) !important;
-  color: rgba(255,255,255,0.9) !important;
+  background: var(--md-sys-color-surface-container-low) !important;
+  border-color: var(--md-sys-color-outline-variant) !important;
+  color: var(--md-sys-color-on-surface) !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
 }
 .ant-input:focus, .ant-input-focused,
 .ant-input-number:focus, .ant-input-number-focused {
-  border-color: rgba(228,184,99,0.5) !important;
-  box-shadow: 0 0 0 2px rgba(228,184,99,0.15) !important;
+  border-color: var(--md-sys-color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(168, 199, 250, 0.25) !important;
 }
 .ant-input::placeholder {
-  color: rgba(255,255,255,0.3) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
+  opacity: 0.5;
 }
 .ant-switch {
-  background: rgba(255,255,255,0.12) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
 }
 .ant-switch-checked {
-  background: #E4B863 !important;
+  background: var(--md-sys-color-primary) !important;
+}
+.ant-switch-checked .ant-switch-inner {
+  color: var(--md-sys-color-on-primary) !important;
 }
 .ant-tabs .ant-tabs-tab {
-  color: rgba(255,255,255,0.5) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
+  font-size: 13px !important;
 }
 .ant-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #E4B863 !important;
+  color: var(--md-sys-color-primary) !important;
+  font-weight: 600 !important;
 }
 .ant-tabs .ant-tabs-ink-bar {
-  background: #E4B863 !important;
+  background: var(--md-sys-color-primary) !important;
+  height: 3px !important;
+  border-radius: 3px 3px 0 0 !important;
 }
 .ant-tabs .ant-tabs-nav::before {
-  border-bottom-color: rgba(255,255,255,0.08) !important;
+  border-bottom-color: var(--md-sys-color-outline-variant) !important;
 }
 .ant-radio-button-wrapper {
-  background: rgba(255,255,255,0.06) !important;
-  border-color: rgba(255,255,255,0.12) !important;
-  color: rgba(255,255,255,0.6) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--md-sys-color-outline-variant) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
 }
 .ant-radio-button-wrapper-checked {
-  background: rgba(228,184,99,0.2) !important;
-  border-color: #E4B863 !important;
-  color: #E4B863 !important;
+  background: var(--md-sys-color-primary-container) !important;
+  border-color: var(--md-sys-color-primary) !important;
+  color: var(--md-sys-color-on-primary-container) !important;
+  font-weight: 500 !important;
 }
 .ant-form-item-label > label {
-  color: rgba(255,255,255,0.7) !important;
+  color: var(--md-sys-color-on-surface) !important;
 }
 .ant-slider-rail {
-  background: rgba(255,255,255,0.08) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 .ant-slider-track {
-  background: #E4B863 !important;
+  background: var(--md-sys-color-primary) !important;
 }
 .ant-slider-handle::after {
-  box-shadow: 0 0 0 2px #E4B863 !important;
+  box-shadow: 0 0 0 2px var(--md-sys-color-primary) !important;
 }
 .ant-slider-mark-text {
-  color: rgba(255,255,255,0.35) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
 }
 .ant-checkbox-inner {
-  background: rgba(255,255,255,0.06) !important;
-  border-color: rgba(255,255,255,0.2) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: var(--md-sys-color-outline) !important;
+  border-radius: 4px !important;
 }
 .ant-checkbox-checked .ant-checkbox-inner {
-  background: #E4B863 !important;
-  border-color: #E4B863 !important;
+  background: var(--md-sys-color-primary) !important;
+  border-color: var(--md-sys-color-primary) !important;
+}
+.ant-checkbox-checked .ant-checkbox-inner::after {
+  border-color: var(--md-sys-color-on-primary) !important;
 }
 .ant-tag {
-  background: rgba(255,255,255,0.06) !important;
-  border-color: rgba(255,255,255,0.1) !important;
-  color: rgba(255,255,255,0.7) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--md-sys-color-outline-variant) !important;
+  color: var(--md-sys-color-on-surface) !important;
+  border-radius: var(--md-sys-shape-corner-small) !important;
 }
 .ant-descriptions-bordered .ant-descriptions-item-label {
-  background: rgba(255,255,255,0.04) !important;
-  color: rgba(255,255,255,0.5) !important;
-  border-color: rgba(255,255,255,0.08) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
+  border-color: var(--md-sys-color-outline-variant) !important;
 }
 .ant-descriptions-bordered .ant-descriptions-item-content {
-  background: rgba(255,255,255,0.02) !important;
-  color: rgba(255,255,255,0.8) !important;
-  border-color: rgba(255,255,255,0.08) !important;
+  background: rgba(255, 255, 255, 0.015) !important;
+  color: var(--md-sys-color-on-surface) !important;
+  border-color: var(--md-sys-color-outline-variant) !important;
 }
 .ant-descriptions-bordered .ant-descriptions-view {
-  border-color: rgba(255,255,255,0.08) !important;
+  border-color: var(--md-sys-color-outline-variant) !important;
+  border-radius: var(--md-sys-shape-corner-medium) !important;
 }
 .ant-empty-description {
-  color: rgba(255,255,255,0.35) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
 }
 .ant-spin-dot-item {
-  background: #E4B863 !important;
+  background: var(--md-sys-color-primary) !important;
 }
 .ant-modal .ant-modal-content {
-  background: rgba(11,19,34,0.95) !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
-  backdrop-filter: blur(40px) !important;
+  background: var(--md-sys-color-surface-container-high) !important;
+  border: 1px solid var(--md-sys-color-outline) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6) !important;
 }
 .ant-modal .ant-modal-header {
   background: transparent !important;
-  border-color: rgba(255,255,255,0.08) !important;
+  border-color: var(--md-sys-color-outline-variant) !important;
 }
 .ant-modal .ant-modal-title {
-  color: rgba(255,255,255,0.9) !important;
+  color: var(--md-sys-color-on-surface) !important;
 }
 .ant-modal .ant-modal-body {
-  color: rgba(255,255,255,0.7) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
 }
 .ant-modal .ant-modal-close {
-  color: rgba(255,255,255,0.5) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
 }
 .ant-message .ant-message-notice-content {
-  background: rgba(11,19,34,0.9) !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
-  backdrop-filter: blur(20px) !important;
-  color: rgba(255,255,255,0.9) !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+  background: var(--md-sys-color-surface-container-highest) !important;
+  border: 1px solid var(--md-sys-color-outline) !important;
+  color: var(--md-sys-color-on-surface) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
 }
 .ant-tooltip-inner {
-  background: rgba(11,19,34,0.9) !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
-  backdrop-filter: blur(20px) !important;
+  background: var(--md-sys-color-surface-container-highest) !important;
+  border: 1px solid var(--md-sys-color-outline) !important;
+  color: var(--md-sys-color-on-surface) !important;
+  border-radius: var(--md-sys-shape-corner-small) !important;
 }
 .ant-btn-dashed {
-  background: rgba(255,255,255,0.04) !important;
-  border-color: rgba(255,255,255,0.15) !important;
-  color: rgba(255,255,255,0.6) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: var(--md-sys-color-outline) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
 }
 .ant-btn-dashed:hover {
-  border-color: rgba(228,184,99,0.4) !important;
-  color: #E4B863 !important;
+  border-color: var(--md-sys-color-primary) !important;
+  color: var(--md-sys-color-primary) !important;
 }
 
-/* Ant Design Dropdown / 右键菜单夜航深色玻璃拟态 */
+/* Ant Design Dropdown / 右键菜单 */
 .ant-dropdown .ant-dropdown-menu {
-  background: rgba(11, 19, 34, 0.92) !important;
-  backdrop-filter: blur(40px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 16px !important;
+  background: var(--md-sys-color-surface-container-high) !important;
+  border: 1px solid var(--md-sys-color-outline) !important;
+  border-radius: var(--md-sys-shape-corner-large) !important;
   padding: 6px !important;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8),
-              0 1px 0 0 rgba(255, 255, 255, 0.08) inset,
-              0 -1px 0 0 rgba(0, 0, 0, 0.4) inset !important;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.8) !important;
 }
 
 .ant-dropdown-menu-item {
-  color: rgba(255, 255, 255, 0.8) !important;
-  border-radius: 10px !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
+  border-radius: var(--md-sys-shape-corner-small) !important;
   padding: 8px 14px !important;
   font-size: 13px !important;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: all var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-emphasized) !important;
 }
 
 .ant-dropdown-menu-item:hover,
 .ant-dropdown-menu-item-active {
   background: rgba(255, 255, 255, 0.08) !important;
-  color: #E4B863 !important;
+  color: var(--md-sys-color-primary) !important;
 }
 
 .ant-dropdown-menu-item-divider {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: var(--md-sys-color-outline-variant) !important;
   margin: 4px 0 !important;
 }
 
@@ -1026,15 +1003,15 @@ html, body, #app {
 .window-controls .ant-btn {
   background: rgba(255, 255, 255, 0.04) !important;
   border: 1px solid transparent !important;
-  color: rgba(255, 255, 255, 0.65) !important;
+  color: var(--md-sys-color-on-surface-variant) !important;
   box-shadow: none !important;
-  border-radius: 10px !important;
+  border-radius: var(--md-sys-shape-corner-full) !important;
 }
 
 .window-controls .ant-btn:hover {
   background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  color: #ffffff !important;
+  border-color: var(--md-sys-color-outline-variant) !important;
+  color: var(--md-sys-color-on-surface) !important;
 }
 
 .window-controls .ant-btn[aria-label="关闭窗口"]:hover {

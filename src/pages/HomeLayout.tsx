@@ -20,10 +20,10 @@ import { useRef, useState } from 'react'
 import appLogo from '../static/logo.png'
 
 const items = [
-  { key: '/index/latest', icon: <HomeOutlined aria-hidden className="text-white/50" />, label: '最新' },
-  { key: '/index/top', icon: <ThunderboltOutlined aria-hidden className="text-white/50" />, label: '排行榜' },
-  { key: '/index/hot', icon: <FireOutlined aria-hidden className="text-white/50" />, label: '热门' },
-  { key: '/index/random', icon: <CompassOutlined aria-hidden className="text-white/50" />, label: '随机' },
+  { key: '/index/latest', icon: <HomeOutlined aria-hidden />, label: '最新' },
+  { key: '/index/top', icon: <ThunderboltOutlined aria-hidden />, label: '排行榜' },
+  { key: '/index/hot', icon: <FireOutlined aria-hidden />, label: '热门' },
+  { key: '/index/random', icon: <CompassOutlined aria-hidden />, label: '随机' },
 ]
 
 export function HomeLayout() {
@@ -98,16 +98,16 @@ export function HomeLayout() {
         className="app-header select-none cursor-default"
       >
         <div className="brand-section flex items-center gap-2.5 select-none cursor-pointer group" onClick={() => navigate('/index/latest')} data-tauri-drag-region="false">
-          <div className="brand-mark flex items-center justify-center transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108">
+          <div className="brand-mark flex items-center justify-center transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105">
             <img
               src={appLogo}
               alt="Wallhaven"
-              className="w-8 h-8 object-contain select-none pointer-events-none drop-shadow-[0_2px_10px_rgba(228,184,99,0.3)] transition-all duration-500 group-hover:drop-shadow-[0_4px_16px_rgba(228,184,99,0.5)]"
+              className="w-8 h-8 object-contain select-none pointer-events-none transition-opacity duration-300 group-hover:opacity-90"
             />
           </div>
           <div className="flex flex-col">
-            <div className="app-title text-[13px] font-semibold tracking-tight text-white/90 group-hover:text-[#E4B863] transition-colors duration-300">Wallhaven</div>
-            <div className="app-subtitle text-[10px] text-white/40 font-medium tracking-wide">壁纸管理器</div>
+            <div className="app-title text-[13px] font-semibold tracking-tight text-white/95 group-hover:text-white transition-colors duration-200">Wallhaven</div>
+            <div className="app-subtitle text-[10px] text-white/45 font-medium tracking-wide">壁纸画廊</div>
           </div>
         </div>
 
@@ -126,9 +126,9 @@ export function HomeLayout() {
             onChange={(event) => setSearch(event.target.value)}
             onPressEnter={searchWallpapers}
             allowClear
-            prefix={<SearchOutlined className="text-white/40 text-xs" />}
+            prefix={<SearchOutlined className="text-white/50 text-xs" />}
             placeholder="搜索壁纸..."
-            className="search-input !h-8 !text-xs !bg-white/6 hover:!bg-white/10 focus:!bg-white/12 !border-white/10 focus:!border-[#E4B863]/50 !rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus:!shadow-[0_0_0_2px_rgba(228,184,99,0.15)]"
+            className="search-input !h-9 !text-xs !bg-[#161921] hover:!bg-[#1C2028] focus:!bg-[#222630] !border-white/12 focus:!border-[#A8C7FA]/60 !rounded-full transition-all duration-300 focus:!shadow-[0_0_0_2px_rgba(168,199,250,0.2)]"
           />
 
           <Tooltip title="刷新">
@@ -136,7 +136,7 @@ export function HomeLayout() {
               aria-label="刷新"
               icon={<ReloadOutlined className="text-sm text-white/80" />}
               onClick={refresh}
-              className="!h-8 !w-8 !min-w-8 !p-0 !rounded-2xl !border-white/10 !bg-white/6 hover:!bg-white/12 active:!scale-95 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="!h-9 !w-9 !min-w-9 !p-0 !rounded-full !border-white/10 !bg-white/6 hover:!bg-white/12 active:!scale-95 transition-all duration-300"
             />
           </Tooltip>
 
@@ -145,7 +145,7 @@ export function HomeLayout() {
               aria-label="设置"
               icon={<SettingOutlined className="text-sm text-white/80" />}
               onClick={openConfig}
-              className="!h-8 !w-8 !min-w-8 !p-0 !rounded-2xl !border-white/10 !bg-white/6 hover:!bg-white/12 active:!scale-95 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="!h-9 !w-9 !min-w-9 !p-0 !rounded-full !border-white/10 !bg-white/6 hover:!bg-white/12 active:!scale-95 transition-all duration-300"
             />
           </Tooltip>
 
@@ -154,7 +154,7 @@ export function HomeLayout() {
               aria-label="GitHub"
               icon={<GithubOutlined className="text-sm text-white/80" />}
               onClick={() => open('https://github.com/sunnnnner/wallhaven_rs').catch((error) => message.error(`打开链接失败：${String(error)}`))}
-              className="!h-8 !w-8 !min-w-8 !p-0 !rounded-2xl !border-white/10 !bg-white/6 hover:!bg-white/12 active:!scale-95 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="!h-9 !w-9 !min-w-9 !p-0 !rounded-full !border-white/10 !bg-white/6 hover:!bg-white/12 active:!scale-95 transition-all duration-300"
             />
           </Tooltip>
 
@@ -165,7 +165,7 @@ export function HomeLayout() {
                 aria-label="最小化"
                 icon={<MinusOutlined className="text-xs text-white/70" />}
                 onClick={minimizeWindow}
-                className="!h-7 !w-7 !min-w-7 !p-0 !rounded-xl !border-transparent !bg-white/4 hover:!bg-white/10 !text-white/70 hover:!text-white active:!scale-95 transition-all duration-300"
+                className="!h-7 !w-7 !min-w-7 !p-0 !rounded-full !border-transparent !bg-white/4 hover:!bg-white/10 !text-white/70 hover:!text-white active:!scale-95 transition-all duration-200"
               />
             </Tooltip>
 
@@ -174,7 +174,7 @@ export function HomeLayout() {
                 aria-label="最大化"
                 icon={<BorderOutlined className="text-xs text-white/70" />}
                 onClick={toggleMaximizeWindow}
-                className="!h-7 !w-7 !min-w-7 !p-0 !rounded-xl !border-transparent !bg-white/4 hover:!bg-white/10 !text-white/70 hover:!text-white active:!scale-95 transition-all duration-300"
+                className="!h-7 !w-7 !min-w-7 !p-0 !rounded-full !border-transparent !bg-white/4 hover:!bg-white/10 !text-white/70 hover:!text-white active:!scale-95 transition-all duration-200"
               />
             </Tooltip>
 
@@ -183,7 +183,7 @@ export function HomeLayout() {
                 aria-label="关闭窗口"
                 icon={<CloseOutlined className="text-xs text-white/70" />}
                 onClick={closeWindow}
-                className="!h-7 !w-7 !min-w-7 !p-0 !rounded-xl !border-transparent !bg-white/4 hover:!bg-red-500/80 !text-white/70 hover:!text-white active:!scale-95 transition-all duration-300"
+                className="!h-7 !w-7 !min-w-7 !p-0 !rounded-full !border-transparent !bg-white/4 hover:!bg-red-500/80 !text-white/70 hover:!text-white active:!scale-95 transition-all duration-200"
               />
             </Tooltip>
           </div>
@@ -194,8 +194,8 @@ export function HomeLayout() {
         <Outlet />
       </Layout.Content>
 
-      {/* 移动端专属沉浸式底部导航栏 (极佳单手拇指触控，带安全区与设置直达入口) */}
-      <nav aria-label="移动端底部导航" className="mobile-bottom-nav fixed bottom-0 inset-x-0 z-40 flex items-center justify-around bg-[#0B1322]/90 backdrop-blur-xl border-t border-white/10 select-none">
+      {/* 移动端专属 M3 沉浸式底部导航栏 (Navigation Bar 规范，带胶囊指示器) */}
+      <nav aria-label="移动端底部导航" className="mobile-bottom-nav fixed bottom-0 inset-x-0 z-40 flex items-center justify-around bg-[#161921]/95 backdrop-blur-2xl border-t border-white/8 select-none">
         {items.map((item) => {
           const isActive = activeKey === item.key
           return (
@@ -203,24 +203,40 @@ export function HomeLayout() {
               key={item.key}
               type="button"
               onClick={() => navigate(item.key)}
-              className={`flex-1 flex flex-col items-center justify-center py-2 transition-all duration-200 border-0 bg-transparent cursor-pointer ${
-                isActive ? 'text-[#E4B863]' : 'text-white/50 hover:text-white/80'
-              }`}
+              className="flex-1 flex flex-col items-center justify-center py-1 transition-all duration-200 border-0 bg-transparent cursor-pointer group"
             >
-              <div className="text-base leading-none mb-1">{item.icon}</div>
-              <span className="text-[10px] font-medium leading-none">{item.label}</span>
+              <div
+                className={`w-14 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  isActive
+                    ? 'bg-[#1E3A5F] text-[#D3E3FD] shadow-xs'
+                    : 'text-white/50 group-hover:text-white/80 group-hover:bg-white/4'
+                }`}
+              >
+                <div className={`text-base leading-none transition-transform duration-200 ${isActive ? 'scale-105' : ''}`}>
+                  {item.icon}
+                </div>
+              </div>
+              <span
+                className={`text-[11px] leading-none mt-1 transition-colors duration-200 ${
+                  isActive ? 'font-semibold text-[#D3E3FD]' : 'font-medium text-white/50'
+                }`}
+              >
+                {item.label}
+              </span>
             </button>
           )
         })}
         <button
           type="button"
           onClick={openConfig}
-          className="flex-1 flex flex-col items-center justify-center py-2 text-white/50 hover:text-[#E4B863] active:text-[#E4B863] transition-all duration-200 border-0 bg-transparent cursor-pointer"
+          className="flex-1 flex flex-col items-center justify-center py-1 transition-all duration-200 border-0 bg-transparent cursor-pointer group"
         >
-          <div className="text-base leading-none mb-1">
-            <SettingOutlined />
+          <div className="w-14 h-8 rounded-full flex items-center justify-center text-white/50 group-hover:text-white/80 group-hover:bg-white/4 transition-all duration-300">
+            <div className="text-base leading-none">
+              <SettingOutlined />
+            </div>
           </div>
-          <span className="text-[10px] font-medium leading-none">设置</span>
+          <span className="text-[11px] font-medium leading-none mt-1 text-white/50">设置</span>
         </button>
       </nav>
     </Layout>

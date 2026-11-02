@@ -29,6 +29,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
   const [downloading, setDownloading] = useState(false)
   const [settingWallpaper, setSettingWallpaper] = useState(false)
   const [failedUrls, setFailedUrls] = useState<Set<string>>(new Set())
+  const [showMockup, setShowMockup] = useState(false)
   const downloadBusy = useRef(false)
   const wallpaperBusy = useRef(false)
   const requestRef = useRef({ page: 1, busy: false, ended: false, active: false })
@@ -83,6 +84,16 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
     }
   }, [loadMore])
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && currentName) {
+        setCurrentName('')
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [currentName])
+
   const currentIndex = images.findIndex((image) => image.name === currentName)
   const currentImage = images[currentIndex]
   const selectedImages = images.filter((image) => selected.has(image.name))
@@ -101,7 +112,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
     }
   }
 
-  // 键盘左右键支持快捷无缝切图，Esc 关闭预览
+  // 键盘左右键支持快捷无缝切图，空格/Esc 控制预览
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
@@ -111,11 +122,18 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
         selectNext()
       } else if (e.key === 'Escape') {
         setCurrentName('')
+      } else if (e.key === ' ') {
+        e.preventDefault()
+        if (currentName) {
+          setCurrentName('')
+        } else if (images.length > 0) {
+          selectImage(images[0])
+        }
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentIndex, images])
+  }, [currentIndex, images, currentName])
 
   const toggleSelected = (name: string) => {
     setSelected((current) => {
@@ -249,7 +267,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
               壁纸画廊 ({images.length})
             </span>
             <span className="text-[11px] text-white/40 hidden sm:inline">
-              · 点击卡片弹出超清遮罩层大图
+              · 空格键或点击预览大图
             </span>
           </div>
 
@@ -286,11 +304,11 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
             return (
               <li
                 key={image.name}
-                className={`thumbnail-container card-stagger-in group relative rounded-2xl overflow-hidden cursor-pointer ${
+                className={`thumbnail-container card-stagger-in group relative rounded-xl overflow-hidden cursor-pointer ${
                   isSelected
-                    ? 'selected ring-2 ring-[#E4B863] border-transparent shadow-[0_0_0_2px_rgba(228,184,99,0.45),0_16px_32px_-6px_rgba(228,184,99,0.28)]'
+                    ? 'selected ring-2 ring-white/80 border-transparent shadow-[0_12px_28px_-6px_rgba(0,0,0,0.7)]'
                     : isActive
-                      ? 'active ring-2 ring-white/30 border-transparent shadow-[0_0_0_2px_rgba(255,255,255,0.2),0_12px_24px_-4px_rgba(0,0,0,0.4)]'
+                      ? 'active ring-1 ring-white/50 border-transparent shadow-[0_8px_20px_-4px_rgba(0,0,0,0.5)]'
                       : ''
                 }`}
                 style={{
@@ -333,9 +351,9 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                     />
                   </div>
 
-                  {/* 右上角：磨砂玻璃分辨率微徽章 (hover 优雅浮现) */}
+                  {/* 右上角：磨砂玻璃分辨率微徽章 (hover 优雅浮现，M3 Assist Chip 规范) */}
                   <div className="absolute top-2.5 right-2.5 z-10 pointer-events-none transition-opacity duration-200 opacity-0 group-hover:opacity-100">
-                    <span className="resolution text-[10px] font-mono font-medium text-white/95 bg-black/45 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/15 shadow-xs">
+                    <span className="resolution text-[10px] font-mono font-medium text-white/95 bg-black/45 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/15 shadow-xs">
                       {image.width} × {image.height}
                     </span>
                   </div>
@@ -404,11 +422,11 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
           )}
         </ul>
 
-        {/* 底部悬浮批量操作胶囊栏 (在平铺未展开大图时优雅悬浮) */}
+        {/* 底部悬浮批量操作胶囊栏 (M3 Floating Pill Bar) */}
         {!currentImage && selected.size > 0 && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-5 py-2.5 bg-white/8 text-white backdrop-blur-[60px] backdrop-saturate-[180%] rounded-full shadow-[0_20px_50px_-10px_rgba(0,0,0,0.6),0_1px_0_0_rgba(255,255,255,0.08)_inset,0_-1px_0_0_rgba(0,0,0,0.3)_inset,0_0_30px_rgba(228,184,99,0.15)] border border-white/15">
-            <span className="text-xs font-medium flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#E4B863] animate-pulse" />
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-4 py-2 bg-[#1C2028]/95 text-white backdrop-blur-xl rounded-full shadow-[0_16px_36px_-8px_rgba(0,0,0,0.7)] border border-white/12">
+            <span className="text-xs font-medium flex items-center gap-2 text-white/90">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#A8C7FA] animate-pulse" />
               已选择 {selected.size} 项
             </span>
             <Button
@@ -418,7 +436,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
               icon={<DownloadOutlined aria-hidden className="text-xs" />}
               loading={downloading}
               onClick={downloadSelected}
-              className="!h-7 !px-3.5 !text-xs !font-medium !rounded-full !bg-[#E4B863] !text-[#0B1322] hover:!bg-[#d4a853] !border-0 shadow-[0_2px_12px_rgba(228,184,99,0.35)] active:!scale-95 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="!h-7 !px-3.5 !text-xs !font-semibold !rounded-full !bg-[#A8C7FA] !text-[#062E6F] hover:!bg-[#C2E7FF] !border-0 shadow-xs active:!scale-95 transition-all duration-300"
             >
               下载选中 ({selected.size})
             </Button>
@@ -426,7 +444,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
               type="text"
               size="small"
               onClick={() => setSelected(new Set())}
-              className="!h-7 !px-2.5 !text-xs !text-zinc-300 hover:!text-white hover:!bg-white/10 !rounded-full"
+              className="!h-7 !px-2.5 !text-xs !text-[#C4C6D0] hover:!text-white hover:!bg-white/10 !rounded-full"
             >
               清除
             </Button>
@@ -434,65 +452,69 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
         )}
       </aside>
 
-      {/* 全屏模态遮罩层 (纯遮罩层浮层展示，不在窗口上上下左右分出任何区域) */}
+      {/* 全屏无界沉浸壁纸展台 (彻底拆除小窗口弹窗边框与尺寸束缚，壁纸满屏展开) */}
       {currentImage && (
         <main
-          className="right-content fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 pointer-events-none select-none overflow-hidden"
-          style={{ maxWidth: '100vw', maxHeight: '100vh' }}
+          className="right-content fixed inset-0 z-50 flex flex-col pointer-events-none select-none overflow-hidden bg-black/95 transition-all duration-300"
+          style={{ width: '100vw', height: '100vh' }}
         >
-          {/* 深空半透明磨砂玻璃遮罩背景 */}
+          {/* 展台无界容器 (彻底移除小窗口卡片边框与阴影，仅作为内容容器) */}
           <div
-            className="absolute inset-0 bg-[#0B1322]/85 backdrop-blur-[60px] backdrop-saturate-[180%] transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none"
+            className="image-viewer relative z-10 flex flex-col items-center justify-between pointer-events-none max-w-full h-full py-3 sm:py-5 px-3"
             style={{
-              backgroundImage: `radial-gradient(ellipse 80% 60% at 50% 50%, rgba(56, 130, 200, 0.12), transparent 70%), radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)`,
-              backgroundSize: '100% 100%, 24px 24px',
-            }}
-          />
-
-          {/* 居中浮层大图展台卡片 (宽屏超清展示，彻底摆脱手机竖屏狭窄感) */}
-          <div
-            className="image-viewer relative z-10 flex flex-col bg-white/5 backdrop-blur-[60px] backdrop-saturate-[180%] border border-white/15 rounded-3xl shadow-[0_25px_70px_-15px_rgba(0,0,0,0.85),0_1px_0_0_rgba(255,255,255,0.08)_inset,0_-1px_0_0_rgba(0,0,0,0.4)_inset,0_0_40px_rgba(228,184,99,0.1)] overflow-hidden pointer-events-auto max-w-[94vw] max-h-[90vh]"
-            style={{
-              width: 'min(86vw, 960px)',
-              height: 'min(80vh, 640px)',
+              width: 'min(86vw, 980px)',
+              height: '100vh',
             }}
           >
-            {/* 展台控制栏 */}
-            <div className="toolbar flex items-center justify-between px-3 md:px-4 py-2.5 bg-white/5 border-b border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.02)] z-10 flex-wrap gap-2 max-w-full">
+            {/* 顶部悬浮毛玻璃 M3 控制胶囊栏 (Floating Minimal Top Glass Bar) */}
+            <div className="toolbar w-full flex items-center justify-between px-3.5 sm:px-4 py-2 bg-[#1C2028]/85 backdrop-blur-2xl border border-white/12 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.6)] pointer-events-auto gap-2 flex-wrap max-w-full">
               <Space className="image-info flex items-center gap-1.5 overflow-hidden min-w-0">
                 <Button
                   aria-label="返回列表"
                   icon={<ArrowLeftOutlined className="text-xs" />}
                   onClick={() => setCurrentName('')}
-                  className="!h-7 !px-2 !text-xs !font-medium !rounded-md !border-white/20 !bg-white/15 hover:!bg-white/25 !text-white active:!scale-95 transition-all shadow-xs inline-flex items-center gap-1"
+                  className="!h-7 !px-3 !text-xs !font-medium !rounded-full !border-white/15 !bg-white/10 hover:!bg-white/20 !text-white active:!scale-95 transition-all shadow-xs inline-flex items-center gap-1"
                 >
                   <span>返回</span>
                 </Button>
-                <Tag className="!bg-white/15 !text-white !border-white/20 !backdrop-blur-md !rounded-md !text-xs !font-mono !px-2.5 !py-0.5 max-w-[120px] md:max-w-[180px] truncate font-medium">
+                <Tag className="!bg-white/10 !text-white !border-white/15 !backdrop-blur-md !rounded-full !text-xs !font-mono !px-2.5 !py-0.5 max-w-[120px] md:max-w-[200px] truncate font-medium">
                   {currentImage.name}
                 </Tag>
-                <Tag color="default" className="!bg-[#E4B863]/20 !text-[#E4B863] !border-[#E4B863]/30 !backdrop-blur-md !rounded-md !text-xs !font-mono !px-2 !py-0.5 font-medium">
+                <Tag color="default" className="!bg-white/8 !text-white/80 !border-white/15 !backdrop-blur-md !rounded-full !text-xs !font-mono !px-2 !py-0.5 font-medium">
                   {currentImage.width} x {currentImage.height}
                 </Tag>
               </Space>
 
               <Space wrap className="flex items-center gap-1.5">
                 <Button
+                  aria-label="模拟桌面"
+                  icon={<DesktopOutlined aria-hidden className="text-xs" />}
+                  onClick={() => setShowMockup((v) => !v)}
+                  className={`!h-7 !px-3 !text-xs !font-medium !rounded-full transition-all shadow-xs ${
+                    showMockup
+                      ? '!border-white/40 !bg-white/25 !text-white'
+                      : '!border-white/15 !bg-white/10 hover:!bg-white/20 !text-white/80'
+                  }`}
+                >
+                  {showMockup ? '退出模拟' : '模拟桌面'}
+                </Button>
+
+                <Button
                   aria-label="下载"
                   icon={<DownloadOutlined aria-hidden className="text-xs" />}
                   loading={downloading}
                   onClick={downloadCurrent}
-                  className="!h-7 !px-2.5 !text-xs !font-medium !rounded-md !border-white/20 !bg-white/15 hover:!bg-white/25 !text-white active:!scale-95 transition-all shadow-xs"
+                  className="!h-7 !px-3.5 !text-xs !font-medium !rounded-full !border-0 !bg-[#1E3A5F] hover:!bg-[#2A4B75] !text-[#D3E3FD] active:!scale-95 transition-all shadow-xs"
                 >
                   下载
                 </Button>
 
                 <Button
                   aria-label="设为壁纸"
-                  icon={<DesktopOutlined aria-hidden className="text-xs" />}
+                  icon={<PictureOutlined aria-hidden className="text-xs" />}
                   loading={settingWallpaper}
                   onClick={setWallpaperCurrent}
-                  className="!h-7 !px-2.5 !text-xs !font-medium !rounded-md !border-[#E4B863]/30 !bg-[#E4B863]/15 hover:!bg-[#E4B863]/25 !text-[#E4B863] active:!scale-95 transition-all shadow-xs"
+                  className="!h-7 !px-4 !text-xs !font-semibold !rounded-full !border-0 !bg-[#A8C7FA] hover:!bg-[#C2E7FF] !text-[#062E6F] active:!scale-95 transition-all shadow-xs"
                 >
                   设为壁纸
                 </Button>
@@ -504,7 +526,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                     icon={<DownloadOutlined aria-hidden className="text-xs" />}
                     disabled={downloading}
                     onClick={downloadSelected}
-                    className="!h-7 !px-2.5 !text-xs !font-medium !rounded-md !bg-[#E4B863] hover:!bg-[#d4a853] !text-[#0B1322] active:!scale-95 transition-all shadow-xs border-0"
+                    className="!h-7 !px-3.5 !text-xs !font-semibold !rounded-full !bg-[#A8C7FA] hover:!bg-[#C2E7FF] !text-[#062E6F] active:!scale-95 transition-all shadow-xs border-0"
                   >
                     下载选中 ({selected.size})
                   </Button>
@@ -515,7 +537,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                     aria-label="打开链接"
                     icon={<LinkOutlined aria-hidden className="text-xs text-white/90" />}
                     onClick={() => open(currentImage.full_url).catch((err) => message.error(`打开链接失败：${String(err)}`))}
-                    className="!h-7 !w-7 !min-w-7 !p-0 !rounded-md !border-white/20 !bg-white/15 hover:!bg-white/25 !text-white active:!scale-95 transition-all shadow-xs"
+                    className="!h-7 !w-7 !min-w-7 !p-0 !rounded-full !border-white/15 !bg-white/10 hover:!bg-white/20 !text-white active:!scale-95 transition-all shadow-xs"
                   />
                 </Tooltip>
 
@@ -529,7 +551,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                         .then(() => message.success('链接已复制到剪贴板'))
                         .catch(() => message.error('复制失败'))
                     }
-                    className="!h-7 !w-7 !min-w-7 !p-0 !rounded-md !border-white/20 !bg-white/15 hover:!bg-white/25 !text-white active:!scale-95 transition-all shadow-xs"
+                    className="!h-7 !w-7 !min-w-7 !p-0 !rounded-full !border-white/15 !bg-white/10 hover:!bg-white/20 !text-white active:!scale-95 transition-all shadow-xs"
                   />
                 </Tooltip>
 
@@ -538,20 +560,20 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                     aria-label="关闭预览"
                     icon={<CloseOutlined aria-hidden className="text-xs text-white/90" />}
                     onClick={() => setCurrentName('')}
-                    className="!h-7 !w-7 !min-w-7 !p-0 !rounded-md !border-white/20 !bg-white/20 hover:!bg-red-500/80 !text-white active:!scale-95 transition-all"
+                    className="!h-7 !w-7 !min-w-7 !p-0 !rounded-full !border-white/15 !bg-white/10 hover:!bg-red-500/80 !text-white active:!scale-95 transition-all"
                   />
                 </Tooltip>
               </Space>
             </div>
 
-            {/* 大图居中展示区 (深空聚光灯展台 - 支持右键点击弹出菜单) */}
+            {/* 大图居中展示区 (支持右键菜单与桌面模拟遮罩，壁纸全幅铺满展示) */}
             <Dropdown menu={{ items: contextMenuItems }} trigger={['contextMenu']}>
-              <div className="full-image-container flex-1 min-h-0 relative flex items-center justify-center p-3 md:p-6 overflow-hidden bg-black/50 cursor-context-menu">
+              <div className="full-image-container flex-1 min-h-0 w-full relative flex items-center justify-center p-2 sm:p-4 overflow-hidden bg-transparent cursor-context-menu pointer-events-auto">
                 <Image
                   key={currentImage.full_url}
                   src={getImageSrc(currentImage.full_url)}
                   alt={currentImage.name}
-                  className="full-image shadow-[0_20px_50px_-15px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.12)] rounded-lg pointer-events-auto"
+                  className="full-image rounded-xl pointer-events-auto transition-all duration-300"
                   style={{ objectFit: fit }}
                   width="100%"
                   height="100%"
@@ -559,11 +581,46 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                   preview={{ motionName: '' }}
                   onError={() => handleImgError(currentImage.full_url)}
                 />
+
+                {/* 真实桌面/移动端元素遮挡模拟层 */}
+                {showMockup && (
+                  <div className="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-4 sm:p-6 select-none">
+                    {/* 顶部系统状态栏模拟 */}
+                    <div className="flex items-center justify-between px-4 py-1.5 bg-black/50 backdrop-blur-md rounded-full text-xs text-white/80 border border-white/10 shadow-sm max-w-xl mx-auto w-full">
+                      <div className="flex items-center gap-3">
+                        <span className="font-semibold text-white/95"></span>
+                        <span className="hidden sm:inline text-white/70">访达</span>
+                        <span className="hidden sm:inline text-white/70">文件</span>
+                        <span className="hidden sm:inline text-white/70">窗口</span>
+                      </div>
+                      <div className="flex items-center gap-3 font-mono text-xs">
+                        <span>100%</span>
+                        <span>Wi-Fi</span>
+                        <span>09:41 周三</span>
+                      </div>
+                    </div>
+
+                    {/* 中部时间与天气组件模拟 */}
+                    <div className="text-center my-auto drop-shadow-lg">
+                      <div className="text-5xl sm:text-7xl font-extralight tracking-tight text-white/95 font-sans">09:41</div>
+                      <div className="text-sm text-white/80 mt-2 font-medium tracking-wide">10月29日 星期三 · 晴 21°C</div>
+                    </div>
+
+                    {/* 底部 Dock 栏模拟 */}
+                    <div className="mx-auto flex items-center gap-3 px-4 py-2 bg-white/12 backdrop-blur-2xl rounded-2xl border border-white/15 shadow-2xl">
+                      {['📁', '🌐', '🎵', '⚙️', '🖼️', '💬'].map((icon, i) => (
+                        <div key={i} className="w-10 h-10 rounded-xl bg-white/20 border border-white/15 flex items-center justify-center text-sm shadow-xs hover:scale-110 transition-transform">
+                          {icon}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </Dropdown>
 
-            {/* 展台底部控制栏 */}
-            <div className="bottom-controls shrink-0 px-3 md:px-4 py-2 bg-white/5 border-t border-white/10 flex items-center justify-between text-xs text-white/80 flex-wrap gap-2">
+            {/* 底部悬浮毛玻璃 M3 控制胶囊栏 (Floating Minimal Bottom Glass Bar) */}
+            <div className="bottom-controls w-full flex items-center justify-between px-3.5 sm:px-4 py-2 bg-[#1C2028]/85 backdrop-blur-2xl border border-white/12 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.6)] pointer-events-auto text-xs text-white/80 flex-wrap gap-2">
               <Radio.Group
                 value={fit}
                 onChange={(event) => setFit(event.target.value)}
@@ -576,8 +633,8 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                 <Radio.Button value="scale-down">缩小</Radio.Button>
               </Radio.Group>
 
-              <span className="hidden md:inline-flex items-center gap-1 text-[11px] text-white/40 select-none">
-                💡 右键图片可保存或设为壁纸
+              <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] text-white/50 select-none font-medium">
+                💡 右键图片可保存或设为壁纸 · 按 Esc 退出沉浸预览
               </span>
 
               <Space className="navigation flex items-center gap-1.5 font-mono">
@@ -587,7 +644,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                   icon={<ArrowLeftOutlined className="text-xs" />}
                   disabled={currentIndex <= 0}
                   onClick={selectPrev}
-                  className="!h-6 !w-6 !min-w-6 !p-0 !rounded-md !bg-white/10 !text-white hover:!bg-white/20 !border-white/20"
+                  className="!h-6 !w-6 !min-w-6 !p-0 !rounded-full !bg-white/10 !text-white hover:!bg-white/20 !border-white/20"
                 />
                 <span className="px-1 text-[11px] text-white/80 font-medium">
                   {currentIndex + 1} / {images.length}
@@ -598,7 +655,7 @@ export function WallpaperBrowser({ query }: { query: WallQuery }) {
                   icon={<ArrowRightOutlined className="text-xs" />}
                   disabled={currentIndex < 0 || currentIndex >= images.length - 1}
                   onClick={selectNext}
-                  className="!h-6 !w-6 !min-w-6 !p-0 !rounded-md !bg-white/10 !text-white hover:!bg-white/20 !border-white/20"
+                  className="!h-6 !w-6 !min-w-6 !p-0 !rounded-full !bg-white/10 !text-white hover:!bg-white/20 !border-white/20"
                 />
               </Space>
             </div>
